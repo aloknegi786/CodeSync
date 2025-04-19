@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 
 function EditorPage() {
     const socketRef = useRef(null);
+    const codeRef = useRef(null);
     const location = useLocation();
     const reactNavigator = useNavigate();
     const { roomId } = useParams();
@@ -31,13 +32,16 @@ function EditorPage() {
                 username: location.state?.username,
             });
     
-            socketRef.current.off(ACTIONS.JOINED);
             socketRef.current.on(ACTIONS.JOINED, ({ clients, username, socketId }) => {
                 if (username !== location.state?.username) {
-                    console.log("socketId: ", socketId);
                     toast.success(`${username} joined the room`);
                 }
                 setClients(clients);
+                console.log(codeRef.current);
+                socketRef.current.emit(ACTIONS.SYNC_CODE, {
+                    code: codeRef.current,
+                    socketId,
+                });
             });
 
             socketRef.current.on(ACTIONS.DISCONNECTED, ({socketId, username}) => {
@@ -61,6 +65,20 @@ function EditorPage() {
             }
         };
     }, []);
+
+    useEffect(()=>{
+        if (socketRef.current) {
+          socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {
+            if (code != null) {
+              cmInstanceRef.current.setValue(code);
+            }
+          });
+        }
+    
+        return () => {
+          socketRef.current.off(ACTIONS.CODE_CHANGE);
+        }
+      },[socketRef.current]);
     
     async function copyRoomId(){
         try{
@@ -111,6 +129,7 @@ function EditorPage() {
             <Editor 
                 socketRef={socketRef} 
                 roomId={roomId} 
+                onCodeChange={(code) => {codeRef.current = code}}
             />
         </div>
     </div>

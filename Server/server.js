@@ -51,6 +51,10 @@ io.on('connection', (socket) => {
         delete userSocketMap[socket.id];
         socket.leave();
     });
+
+    socket.on(ACTIONS.SYNC_CODE, ({ socketId, code}) => {
+        io.to(socketId).emit(ACTIONS.CODE_CHANGE, {code});
+    });
     
 });
 
