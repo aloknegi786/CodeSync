@@ -29,12 +29,27 @@ io.on('connection', (socket) => {
     
         const clients = getAllConnectedClients(roomId);
     
-        // ✅ Broadcast JOINED to everyone in the room once
         io.in(roomId).emit(ACTIONS.JOINED, {
             clients,
             username,
             socketId: socket.id,
         });
+    });
+
+    socket.on(ACTIONS.CODE_CHANGE, ({roomId, code}) => {
+        io.to(roomId).emit(ACTIONS.CODE_CHANGE, { code });
+    });
+
+    socket.on('disconnecting', () => {
+        const rooms = [...socket.rooms];
+        rooms.forEach((roomId) => {
+            socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
+                socketId: socket.id,
+                username: userSocketMap[socket.id],
+            });
+        });
+        delete userSocketMap[socket.id];
+        socket.leave();
     });
     
 });

@@ -39,14 +39,23 @@ function EditorPage() {
                 }
                 setClients(clients);
             });
+
+            socketRef.current.on(ACTIONS.DISCONNECTED, ({socketId, username}) => {
+                toast.success(`${username} left the room`);
+                setClients((prev) => {
+                    return prev.filter(client => client.socketId != socketId);
+                });
+            });
         };
     
         if(socketRef.current === null) init();
     
+        // cleaning functions
         return () => {
             if (socketRef.current) {
                 socketRef.current.disconnect();
                 socketRef.current.off(ACTIONS.JOINED);
+                socketRef.current.off(ACTIONS.DISCONNECTED);
                 socketRef.current.off('connect_error');
                 socketRef.current.off('connect_failed');
             }
@@ -87,7 +96,10 @@ function EditorPage() {
             </button>
         </div>
         <div className='editorWrap'>
-            <Editor />
+            <Editor 
+                socketRef={socketRef} 
+                roomId={roomId} 
+            />
         </div>
     </div>
   )
