@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 function EditorPage() {
     const socketRef = useRef(null);
     const location = useLocation();
-    const navigator = useNavigate();
+    const reactNavigator = useNavigate();
     const { roomId } = useParams();
     
     const [clients, setClients] = useState([]);
@@ -23,7 +23,7 @@ function EditorPage() {
             function handleErrors(err) {
                 console.log('Socket error', err);
                 toast.error('Socket connection failed, try again later');
-                navigator('/');
+                reactNavigator('/');
             }
     
             socketRef.current.emit(ACTIONS.JOIN, {
@@ -64,10 +64,16 @@ function EditorPage() {
     
     async function copyRoomId(){
         try{
-            
+            await navigator.clipboard.writeText(roomId);
+            toast.success(`Room ID has been copied to your clipboard`);
         } catch(err){
-
+            toast.error(`Could not copy Room ID`);
+            console.log("Error: ", err);
         }
+    }
+
+    function leaveRoom(){
+        reactNavigator('/');
     }
 
     if(!location.state){
@@ -97,7 +103,7 @@ function EditorPage() {
             <button className="btn copyBtn" onClick={copyRoomId}>
                 Copy ROOM ID
             </button>
-            <button className='btn leaveBtn'>
+            <button className='btn leaveBtn' onClick={leaveRoom}>
                 Leave
             </button>
         </div>
