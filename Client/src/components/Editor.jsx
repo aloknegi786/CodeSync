@@ -32,6 +32,7 @@ function Editor({socketRef, roomId}) {
           });
         }
     });
+    
 
     // cmInstanceRef.current.setValue(`console.log('hello')`);
 
@@ -43,6 +44,16 @@ function Editor({socketRef, roomId}) {
       }
     }
   }, [])
+
+  useEffect(()=>{
+    if (socketRef.current) {
+      socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {
+        if (code != null && cmInstanceRef.current) {
+          cmInstanceRef.current.setValue(code);
+        }
+      });
+    }
+  },[socketRef.current]);
 
   return <textarea ref={editorRef} />
 }

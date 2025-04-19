@@ -48,7 +48,7 @@ function EditorPage() {
             });
         };
     
-        if(socketRef.current === null) init();
+        init();
     
         // cleaning functions
         return () => {
@@ -62,7 +62,13 @@ function EditorPage() {
         };
     }, []);
     
+    async function copyRoomId(){
+        try{
+            
+        } catch(err){
 
+        }
+    }
 
     if(!location.state){
         return <Navigate to="/" />
@@ -88,7 +94,7 @@ function EditorPage() {
                 </div>
             </div>
 
-            <button className="btn copyBtn">
+            <button className="btn copyBtn" onClick={copyRoomId}>
                 Copy ROOM ID
             </button>
             <button className='btn leaveBtn'>
