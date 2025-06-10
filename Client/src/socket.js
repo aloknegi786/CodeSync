@@ -22,3 +22,8 @@ export const initSocket = async () => {
 
     return socket;
 };
+
+export const resetSocket = async () => {
+    socket = null;
+    return ;
+}
