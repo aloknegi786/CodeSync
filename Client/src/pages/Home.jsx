@@ -5,8 +5,7 @@ import toast from 'react-hot-toast';
 
 function Home() {
     const navigate = useNavigate();
-
-    const [roomId, setRoomId] = useState(null);
+    const [roomId, setRoomId] = useState('');
     const [username, setUsername] = useState('');
 
     const createNewRoom = (e) => {
