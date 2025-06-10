@@ -99,8 +99,9 @@
   background: #1c1e29;
   padding: 16px;
   color: #fff;
-  display: flex;
+  display: flex;  
   flex-direction: column;
+  box-sizing: border-box;
  }
 
  .asideInner {
