@@ -1,46 +1,28 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import Editor, { useMonaco } from '@monaco-editor/react';
 import ACTIONS from '../Actions';
-import { useMyPresence, useOthers } from '@liveblocks/react';
 
-function MonacoEditor({ socketRef, roomId, onCodeChange, role }) {
+const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEditorInstance  }, ref) => {
   const editorRef = useRef(null);
   const monacoInstance = useMonaco();
-  const [_, setPresence] = useMyPresence();
-  const others = useOthers();
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
+    setEditorInstance?.(editor);
+  };
 
-    editor.onDidChangeModelContent((event) => {
-      const code = editor.getValue();
-      onCodeChange(code);
+  const handleEditorChange = (value) => {
+    // console.log("code: ", value);
+    if (value === undefined) return;
 
-      if (role === 'host' || role === 'editor') {
-        socketRef.current.emit(ACTIONS.CODE_CHANGE, {
-          roomId,
-          code,
-        });
+    onCodeChange(value);
 
-        const position = editor.getPosition();
-        setPresence({ cursor: position, isTyping: true });
-
-        clearTimeout(window._typingTimeout);
-        window._typingTimeout = setTimeout(() => {
-          setPresence({ cursor: null, isTyping: false });
-        }, 2000);
-      }
-    });
-
-    editor.onDidChangeCursorPosition(() => {
-      const position = editor.getPosition();
-      setPresence({ cursor: position, isTyping: true });
-
-      clearTimeout(window._typingTimeout);
-      window._typingTimeout = setTimeout(() => {
-        setPresence({ cursor: null, isTyping: false });
-      }, 2000);
-    });
+    if (role === 'host' || role === 'editor') {
+      socketRef.current.emit(ACTIONS.CODE_CHANGE, {
+        roomId,
+        code: value,
+      });
+    }
   };
 
   useEffect(() => {
@@ -49,24 +31,36 @@ function MonacoEditor({ socketRef, roomId, onCodeChange, role }) {
         if (code != null && editorRef.current) {
           const model = editorRef.current.getModel();
           if (model.getValue() !== code) {
+            const pos = editorRef.current.getPosition();
             editorRef.current.setValue(code);
+            editorRef.current.setPosition(pos);
           }
         }
       });
     }
-
     return () => {
       socketRef.current?.off(ACTIONS.CODE_CHANGE);
     };
-  }, [socketRef.current]);
+  }, []);
 
   useEffect(() => {
     if (!editorRef.current) return;
-
     editorRef.current.updateOptions({
       readOnly: role === 'viewer' || role === 'pending',
     });
   }, [role]);
+
+  useImperativeHandle(ref, () => ({
+    setValue: (code) => {
+      if (editorRef.current) editorRef.current.setValue(code);
+    },
+    getValue: () => editorRef.current?.getValue(),
+    getInstance: () => editorRef.current,
+    undo: () => editorRef.current?.trigger('keyboard', 'undo', null),
+    redo: () => editorRef.current?.trigger('keyboard', 'redo', null),
+    focus: () => editorRef.current?.focus(),
+    scrollToLine: (line) => editorRef.current?.revealLineInCenter(line),
+  }));
 
   return (
     <div className="w-full h-full relative">
@@ -76,6 +70,9 @@ function MonacoEditor({ socketRef, roomId, onCodeChange, role }) {
         defaultValue="// Start coding..."
         theme="vs-dark"
         onMount={handleEditorDidMount}
+        onChange={(value) => {
+          handleEditorChange(value);
+        }}
         options={{
           minimap: { enabled: false },
           automaticLayout: true,
@@ -83,6 +80,6 @@ function MonacoEditor({ socketRef, roomId, onCodeChange, role }) {
       />
     </div>
   );
-}
+});
 
 export default MonacoEditor;
