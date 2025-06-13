@@ -7,10 +7,6 @@ import EditorPage from './pages/EditorPage';
 
 function App() {
 
-  function changeRole(){
-    setRole("host");
-  }
-
   return (
     <>
       <div>
