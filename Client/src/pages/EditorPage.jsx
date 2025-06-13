@@ -1,20 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState ,useCallback, useRef, useEffect } from 'react';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Client from '../components/Client';
-import Editor from '../components/Editor';
+import MonacoEditor from '../components/MonacoEditor';
+import OutputInput from '../components/OutputInput';
 import { initSocket, resetSocket } from '../socket';
 import ACTIONS from '../Actions';
 import toast from 'react-hot-toast';
 import 'react-toastify/dist/ReactToastify.css';
-import OutputPanel from '../components/OutputPanel';
+// import OutputPanel from '../components/OutputPanel';
+import { Box } from '@chakra-ui/react';
+import { Splitter, SplitterPanel } from 'primereact/splitter';
+// import '../components/spli'
+
+import {
+  LiveblocksProvider,
+  RoomProvider,
+  ClientSideSuspense
+} from "@liveblocks/react/suspense";
 
 function EditorPage() {
     const [role, setRole] = useState("viewer");
     const socketRef = useRef(null);
     const codeRef = useRef(null);
+    const editorRef = useRef(null);
     const location = useLocation();
     const reactNavigator = useNavigate();
     const { roomId } = useParams();
+    const [output, setOutput] = useState('click "Run" to run the code')
+    const [input, setInput] = useState('')
+    const [error, setError] = useState(false)
     
     const [clients, setClients] = useState([]);
     useEffect(() => {
@@ -50,6 +64,7 @@ function EditorPage() {
                 const currentUser = clients.find(client => client.username === currentUsername);
                 if (currentUser) {
                     setRole(currentUser.role);
+                    currentUser.username = "You";
                 }
 
                 setClients(clients);
@@ -94,19 +109,32 @@ function EditorPage() {
     }, []);
 
 
-    useEffect(()=>{
-        if (socketRef.current) {
-          socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {
-            if (code != null) {
-              cmInstanceRef.current.setValue(code);
+    useEffect(() => {
+        if (!socketRef.current) return;
+
+        const handleCodeChange = ({ code }) => {
+            if (code != null && editorRef.current) {
+                const currentCode = editorRef.current.getValue();
+                if (currentCode !== code) {
+                    const position = editorRef.current.getPosition();
+                    editorRef.current.setValue(code);
+                    editorRef.current.setPosition(position);
+                }
             }
-          });
-        }
-    
+        };
+
+        socketRef.current.on(ACTIONS.CODE_CHANGE, handleCodeChange);
+
         return () => {
-          socketRef.current.off(ACTIONS.CODE_CHANGE);
-        }
-      },[socketRef.current]);
+            socketRef.current.off(ACTIONS.CODE_CHANGE, handleCodeChange);
+        };
+    }, [socketRef.current]);
+
+    const handleSetEditor = useCallback((editor) => {
+        editorRef.current = editor;
+    }, []);
+
+
     
     async function copyRoomId(){
         try{
@@ -150,116 +178,157 @@ function EditorPage() {
     }
 
   return (
-    <div className='mainWrap flex overflow-x-auto'>
-        <div className='aside w-[230px] flex-shrink-0'>
-            <div className='asideInner'>
-                <div className='logo'>
-                    <img 
-                        className='logoImage' 
-                        src="/code-sync-logo.png" 
-                        alt="code-sync-logo" 
-                    />
-                </div>
-                
-                <div className='w-full text-center my-4 text-lg '>
-                    <h3>
-                        Host
-                    </h3>
-                </div>
-                <div className='clientsList'>
-                    {clients?.map((client) => (
-                        <>
-                            {client?.role?.toLowerCase() === 'host' && (
-                                <Client 
-                                    key={client?.socketId}
-                                    client={client}
-                                    promote={promote} 
-                                />
+    // <LiveblocksProvider publicApiKey="pk_dev_eH0HjUegNKo0QzkeHi5PA3pY74qPGUp5ELD63bJ2t4aST-rDVct5UjCEkaG_uPPW">
+    //             <RoomProvider
+    //             id={roomId}
+    //             initialPresence={{
+    //                 cursor: null,
+    //                 name: location.state?.username,
+    //                 isTyping: false,
+    //             }}
+    //             >
+    //             <ClientSideSuspense fallback={<div>Loading…</div>}>
+                    <div className='mainWrap flex h-screen'>
+                        <div className='aside w-[230px] flex-shrink-0'>
+                            <div className='asideInner'>
+                                <div className='logo'>
+                                    <img 
+                                        className='logoImage' 
+                                        src="/code-sync-logo.png" 
+                                        alt="code-sync-logo" 
+                                    />
+                                </div>
+                                
+                                <div className='w-full text-center my-4 text-lg '>
+                                    <h3>
+                                        Host
+                                    </h3>
+                                </div>
+                                <div className='clientsList'>
+                                    {clients?.map((client) => (
+                                        <>
+                                            {client?.role?.toLowerCase() === 'host' && (
+                                                <Client 
+                                                    key={client?.socketId}
+                                                    client={client}
+                                                    promote={promote} 
+                                                />
+                                            )}
+
+                                        </>
+                                    ))}
+                                </div>
+                                <div className='w-full text-center my-4 text-lg '>
+                                    <h3>
+                                        Editor
+                                    </h3>
+                                </div>
+                                <div className='clientsList'>
+                                    {clients?.some(client => client?.role?.toLowerCase() === 'editor') ? (
+                                        clients.map(client =>
+                                        client?.role?.toLowerCase() === 'editor' && (
+                                            <Client 
+                                                key={client.socketId} 
+                                                client={client}
+                                                promote={promote}
+                                            />
+                                        )
+                                        )
+                                    ) : (
+                                        <small className="block w-full text-center text-sm text-gray-400 mt-2">
+                                            No editors connected.
+                                        </small>
+                                    )}
+                                </div>
+
+                                <div className='w-full text-center my-4 text-lg '>
+                                    <h3>
+                                        Requests
+                                    </h3>
+                                </div>
+                                <div className="clientsList">
+                                    {clients?.some(client => client?.role?.toLowerCase() === 'pending') ? (
+                                        clients
+                                            .filter(client => client?.role?.toLowerCase() === 'pending')
+                                            .map(client => (
+                                                <Client
+                                                    key={client.socketId}
+                                                    client={client}
+                                                    promote={promote}
+                                                />
+                                            ))
+                                    ) : (
+                                        <small className="block w-full text-center text-sm text-gray-400 mt-2">
+                                            No requests till now.
+                                        </small>
+                                    )}
+                                </div>
+
+
+                            </div>
+
+                            {role === "host" && (
+                                <button className="btn copyBtn" onClick={copyRoomId}>
+                                    Copy ROOM ID
+                                </button>
                             )}
+                            {role === "viewer" && (
+                                <button className="btn copyBtn" onClick={requestPromotion}>
+                                    Request Promotion
+                                </button>
+                            )}
+                            <button className='btn leaveBtn' onClick={leaveRoom}>
+                                Leave
+                            </button>
+                        </div>
+                        <div className="flex">
+                            {/* Editor Section */}
+                            <div className="h-full w-1/2 pt-8">
+                            <Box
+                                width="95%"
+                                height="93%"
+                                overflow="auto"
+                                bg="gray.800"
+                                color="white"
+                                p={4}
+                                border="1px"
+                                borderRadius="10"
+                                mt='2'
+                                ml='0.5'
+                                >                                        
+                                    <MonacoEditor
+                                        socketRef={socketRef}
+                                        roomId={roomId}
+                                        onCodeChange={(code) => {
+                                            codeRef.current = code;
+                                        }}
+                                        role={role}
+                                        setEditorInstance={handleSetEditor}
+                                        setOutput={setOutput} 
+                                        input={input} 
+                                        setError={setError}
+                                    />
+                            </Box>
+                            </div>
 
-                        </>
-                    ))}
-                </div>
-                <div className='w-full text-center my-4 text-lg '>
-                    <h3>
-                        Editor
-                    </h3>
-                </div>
-                <div className='clientsList'>
-                    {clients?.some(client => client?.role?.toLowerCase() === 'editor') ? (
-                        clients.map(client =>
-                        client?.role?.toLowerCase() === 'editor' && (
-                            <Client 
-                                key={client.socketId} 
-                                client={client}
-                                promote={promote}
-                            />
-                        )
-                        )
-                    ) : (
-                        <small className="block w-full text-center text-sm text-gray-400 mt-2">
-                            No editors connected.
-                        </small>
-                    )}
-                </div>
-
-                <div className='w-full text-center my-4 text-lg '>
-                    <h3>
-                        Requests
-                    </h3>
-                </div>
-                <div className="clientsList">
-                    {clients?.some(client => client?.role?.toLowerCase() === 'pending') ? (
-                        clients
-                            .filter(client => client?.role?.toLowerCase() === 'pending')
-                            .map(client => (
-                                <Client
-                                    key={client.socketId}
-                                    client={client}
-                                    promote={promote}
-                                />
-                            ))
-                    ) : (
-                        <small className="block w-full text-center text-sm text-gray-400 mt-2">
-                            No requests till now.
-                        </small>
-                    )}
-                </div>
-
-
-            </div>
-
-            {role === "host" && (
-                <button className="btn copyBtn" onClick={copyRoomId}>
-                    Copy ROOM ID
-                </button>
-            )}
-            {role === "viewer" && (
-                <button className="btn copyBtn" onClick={requestPromotion}>
-                    Request Promotion
-                </button>
-            )}
-            <button className='btn leaveBtn' onClick={leaveRoom}>
-                Leave
-            </button>
-        </div>
-        <div className='flex-1 editorWrap w-2/5 border border-red rounded-xlg'>
-            <Editor 
-                socketRef={socketRef} 
-                roomId={roomId} 
-                onCodeChange={(code) => {codeRef.current = code}}
-            />
-        </div>
-
-        <div className='w-3/10 bg-red-500'>
-            <div>
-                {/* {output pannel to be added} */}
-            </div>
-            <div>
-                {/* group chat section to be added */}
-            </div>
-        </div>
-    </div>
+                            {/* Output Panel */}
+                            <div className='h-full w-1/2'>
+                                    <Box
+                                        width="100%"
+                                        height="100%"
+                                        overflow="auto"
+                                        bg="gray.800"
+                                        color="white"
+                                        p={4}
+                                        >
+                                        <OutputInput output={output} setInput={setInput} error={error} />
+                                    </Box>
+                            </div>
+                        </div>
+                    </div>
+            //     </ClientSideSuspense>
+            //     </RoomProvider>
+            // </LiveblocksProvider>
   )
 }
 

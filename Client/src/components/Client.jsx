@@ -1,16 +1,27 @@
-import React from 'react'
-import Avatar from '@mui/material/Avatar'
-import { deepOrange } from '@mui/material/colors'
+import React from 'react';
+import { Avatar, Box, Text } from '@chakra-ui/react';
+import { ACTIONS } from '../../../Server/Actions';
 
-function Client({ username }) {
+function Client({ client, promote }) {
   return (
-    <div className='client'>
-        <Avatar sx={{ bgcolor: deepOrange[500], borderRadius: 3, width: 52, height: 48 }}>
-          {username?.charAt(0).toUpperCase()}
-        </Avatar>
-        <span className='userName'>{username}</span>
-    </div>
-  )
+    <Box
+      className="client"
+      cursor="pointer"
+      display="flex"
+      alignItems="center"
+      gap={2}
+      onClick={() => promote(client.socketId, client.role)}
+    >
+      <Avatar
+        name={client?.username}
+        bg="orange.500"
+        width="52px"
+        height="48px"
+        borderRadius="12px"
+      />
+      <Text className="userName">{client?.username}</Text>
+    </Box>
+  );
 }
 
-export default Client
+export default Client;
