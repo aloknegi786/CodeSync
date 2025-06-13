@@ -2,10 +2,13 @@ import express from "express";
 import http from 'http'
 import { Server } from "socket.io";
 import { ACTIONS } from "./Actions.js";
-import { join } from "path";
+import cors from 'cors'
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+app.use(cors());
+app.use(express.json());
 
 const server = http.createServer(app);
 
@@ -20,20 +23,6 @@ io.on('connection', (socket) => {
         // problem : on reload the user reconnects but as a different userthe hosts identity is lost somewhere
         // last changes
         const room = rooms.get(roomId);
-        if(room){
-            for (const [socketId, data] of room.entries()) {
-                if (data.username === username) {
-                    socketId =  socket.id;
-                    socket.join(roomId);
-                    socket.roomId = roomId;
-                    socket.data.username = username;
-                    socket.data.role = data.role;
-                    sendUserList(roomId, username);
-                    return ;
-                }
-            }
-        }
-
         // till here
 
         socket.join(roomId);
@@ -71,12 +60,26 @@ io.on('connection', (socket) => {
 
 
     socket.on(ACTIONS.CODE_CHANGE, ({roomId, code}) => {
+        const room = rooms.get(roomId);
+        console.log(socket.data.username);
+        console.log(socket.data.role);
+        console.log(code);
+        if(!room) return ;
+        const user = room.get(socket.id);
+        if(!user) return ;
+
+        socket.data.role = user.role;
+        if(socket.data.role === 'viewer' || socket.data.role === 'pending'){
+            io.to(roomId).emit("action_error", {
+                message: "Un-Authorized Action"
+            });
+            return ;
+        }
         socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
     });
 
     socket.on(ACTIONS.PROMOTE, ({ roomId, socketId }) => {
         const room = rooms.get(roomId);
-
         if (!room || socket.data.role !== "host") {
             io.to(socket.id).emit("action_error", {
                 message: "Invalid action"
