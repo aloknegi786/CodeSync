@@ -6,6 +6,11 @@ import Home from './pages/Home'
 import EditorPage from './pages/EditorPage';
 
 function App() {
+
+  function changeRole(){
+    setRole("host");
+  }
+
   return (
     <>
       <div>
@@ -22,7 +27,7 @@ function App() {
       </div>
       <BrowserRouter>
           <Routes>
-              <Route path='/' element = {<Home/>}/>
+              <Route path='/' element = {<Home />}/>
               <Route path='/editor/:roomId' element = {<EditorPage/>}/>
           </Routes>
       </BrowserRouter>
@@ -31,3 +36,4 @@ function App() {
 }
 
 export default App;
+
