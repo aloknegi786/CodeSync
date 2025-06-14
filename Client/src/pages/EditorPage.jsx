@@ -205,11 +205,11 @@ function EditorPage() {
                                     </h3>
                                 </div>
                                 <div className='clientsList'>
-                                    {clients?.map((client) => (
+                                    {clients?.map((client, index) => (
                                         <>
                                             {client?.role?.toLowerCase() === 'host' && (
                                                 <Client 
-                                                    key={client?.socketId}
+                                                    key={index}
                                                     client={client}
                                                     promote={promote} 
                                                 />
@@ -225,10 +225,10 @@ function EditorPage() {
                                 </div>
                                 <div className='clientsList'>
                                     {clients?.some(client => client?.role?.toLowerCase() === 'editor') ? (
-                                        clients.map(client =>
+                                        clients.map((client, index) =>
                                         client?.role?.toLowerCase() === 'editor' && (
                                             <Client 
-                                                key={client.socketId} 
+                                                key={index} 
                                                 client={client}
                                                 promote={promote}
                                             />
@@ -250,9 +250,9 @@ function EditorPage() {
                                     {clients?.some(client => client?.role?.toLowerCase() === 'pending') ? (
                                         clients
                                             .filter(client => client?.role?.toLowerCase() === 'pending')
-                                            .map(client => (
+                                            .map((client, index) => (
                                                 <Client
-                                                    key={client.socketId}
+                                                    key={index}
                                                     client={client}
                                                     promote={promote}
                                                 />
@@ -321,7 +321,7 @@ function EditorPage() {
                                         color="white"
                                         p={4}
                                         >
-                                        <OutputInput output={output} setInput={setInput} error={error} />
+                                        <OutputInput output={output} setInput={setInput} error={error} role={role} />
                                     </Box>
                             </div>
                         </div>

@@ -2,10 +2,13 @@ import { Button,Box,Flex, useToast} from "@chakra-ui/react";
 import { executeCode } from "../assets/api";
 import {useState} from 'react';
 
-export default function Run({language,editorRef,setOutput,input,setError}){
+export default function Run({language,editorRef,setOutput,input,setError, role}){
   const toast=useToast();
   const [isLoading,setIsLoadIng]=useState(false)
   async function onRun(){
+    if(role !== "host"){
+      return ;
+    }
     const sourceCode=editorRef.current.getValue();
     if(!sourceCode) return;
     try{

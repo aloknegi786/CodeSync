@@ -163,13 +163,16 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
         }}
       />
 
-      <Run
-        language={language}
-        editorRef={editorRef}
-        setOutput={setOutput}
-        input={input}
-        setError={setError}
-      />
+      {role === "host" && (
+        <Run
+          language={language}
+          editorRef={editorRef}
+          setOutput={setOutput}
+          input={input}
+          setError={setError}
+          role={role}
+        />
+      )}
     </div>
   );
 });
