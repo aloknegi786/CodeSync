@@ -68,11 +68,6 @@ function EditorPage() {
                 }
 
                 setClients(clients);
-
-                socketRef.current.emit(ACTIONS.SYNC_CODE, {
-                    code: codeRef.current,
-                    socketId,
-                });
             });
 
             socketRef.current.on("notification", ({message}) => {
