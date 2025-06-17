@@ -51,7 +51,7 @@ export function registerSocketHandlers(io, socket) {
     sendUserList(roomId, username);
   });
 
-  socket.on("language_change", ({ language, roomId }) => {
+  socket.on(ACTIONS.LANGUAGE_CHANGE, ({ language, roomId }) => {
       if (socket.data.role !== "host") return;
 
       roomDetails.set(roomId, {
@@ -72,7 +72,7 @@ export function registerSocketHandlers(io, socket) {
       console.log("Language: ",language);
   });
 
-  socket.on("execute", async ({roomId})=> {
+  socket.on(ACTIONS.EXECUTE, async ({roomId})=> {
       if (socket.data.role !== "host") return;
 
       const roomDetail = roomDetails.get(roomId);
@@ -91,17 +91,17 @@ export function registerSocketHandlers(io, socket) {
         roomDetail.isError = false;
       }
 
-      io.to(roomId).emit("output_change", {output: roomDetail.output, isError: roomDetail.isError});
+      io.to(roomId).emit(ACTIONS.OUTPUT_CHANGE, {output: roomDetail.output, isError: roomDetail.isError});
   });
 
-  socket.on("input_change", ({ input, roomId }) => {
+  socket.on(ACTIONS.INPUT_CHANGE, ({ input, roomId }) => {
     if (socket.data.role !== "host" && socket.data.role !== "editor") return;
 
     const roomDetail = roomDetails.get(roomId);
     if (!roomDetail) return;
 
     roomDetail.input = input;
-    io.to(roomId).emit("input_change", {newInput: input});
+    io.to(roomId).emit(ACTIONS.INPUT_CHANGE, {newInput: input});
   });
 
   socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
@@ -154,11 +154,11 @@ export function registerSocketHandlers(io, socket) {
   socket.on(ACTIONS.SYNC_CODE, ({ socketId, roomId }) => {
     const roomDetail = roomDetails.get(roomId);
     io.to(socketId).emit(ACTIONS.CODE_CHANGE, {code: roomDetail.code});
-    io.to(socketId).emit("output_change", {output: roomDetail.output, isError: roomDetail.isError});
-    io.to(socketId).emit("input_change", {newInput: roomDetail.input});
+    io.to(socketId).emit(ACTIONS.OUTPUT_CHANGE, {output: roomDetail.output, isError: roomDetail.isError});
+    io.to(socketId).emit(ACTIONS.INPUT_CHANGE, {newInput: roomDetail.input});
   });
 
-  socket.on("disconnect", () => {
+  socket.on(ACTIONS.DISCONNECT, () => {
     const { roomId, role } = socket.data || {};
 
     if (roomUsers.has(roomId)) {
@@ -167,7 +167,7 @@ export function registerSocketHandlers(io, socket) {
       roomUsers.get(roomId).delete(socket.id);
 
       if (roomUsers.get(roomId).size === 0 || wasHost) {
-        io.to(roomId).emit("close", {
+        io.to(roomId).emit(ACTIONS.CLOSE, {
           message: "Host left! Room will be closed in 2s",
         });
 

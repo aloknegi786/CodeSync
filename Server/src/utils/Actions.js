@@ -7,4 +7,13 @@ export const ACTIONS = {
     CODE_CHANGE: 'code-change',
     SYNC_CODE: 'sync-code',
     LEAVE: 'leave',
+    EXECUTE: 'execute',
+    ACTION_ERROR: 'action_error',  
+    OUTPUT_CHANGE: 'output_change',    
+    INPUT_CHANGE: 'input_change',
+    LANGUAGE_CHANGE: 'language_change',         
+    LANGUAGE_UPDATED: 'language_updated', 
+    NOTIFICATION: 'notification',
+    DISCONNECT: 'disconnect',
+    CLOSE: 'close',                       
 };

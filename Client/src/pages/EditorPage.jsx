@@ -69,25 +69,25 @@ function EditorPage() {
                 setClients(clients);
             });
 
-            socketRef.current.on("input_change", ({newInput}) => {
+            socketRef.current.on(ACTIONS.INPUT_CHANGE, ({newInput}) => {
                 setInput(newInput);
             });
 
-            socketRef.current.on("output_change", ({output, isError}) => {
+            socketRef.current.on(ACTIONS.OUTPUT_CHANGE, ({output, isError}) => {
                 setOutput(output);
                 setError(isError);
                 setIsLoading(false);
             });
 
-            socketRef.current.on("notification", ({message}) => {
+            socketRef.current.on(ACTIONS.NOTIFICATION, ({message}) => {
                 toast(message);
             });
 
-            socketRef.current.on("action_error", ({message}) => {
+            socketRef.current.on(ACTIONS.ACTION_ERROR, ({message}) => {
                 toast.error(message);
             });
 
-            socketRef.current.on("close", ({ message }) => {
+            socketRef.current.on(ACTIONS.CLOSE, ({ message }) => {
                 toast.error(message);
                 setTimeout(() => {
                     reactNavigator('/')
