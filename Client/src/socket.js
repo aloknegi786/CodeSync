@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const URL = 'http://localhost:5000';
+const URL = import.meta.env.VITE_BACKEND_URL;
 let socket = null;
 
 export const initSocket = async () => {
