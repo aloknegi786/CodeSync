@@ -1,6 +1,4 @@
-import React from 'react';
 import { Avatar, Box, Text } from '@chakra-ui/react';
-import { ACTIONS } from '../../../Server/src/utils/Actions';
 
 function Client({ client, promote }) {
   return (

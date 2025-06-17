@@ -1,10 +1,7 @@
 import { Button,Box,Flex, useToast} from "@chakra-ui/react";
-import { executeCode } from "../assets/api";
-import {useState} from 'react';
 
-export default function Run({language,editorRef,setOutput,input,setError, role}){
+export default function Run({language,editorRef,setOutput,input,setError, role, socketRef, roomId, isLoading, setIsLoading}){
   const toast=useToast();
-  const [isLoading,setIsLoadIng]=useState(false)
   async function onRun(){
     if(role !== "host"){
       return ;
@@ -12,13 +9,11 @@ export default function Run({language,editorRef,setOutput,input,setError, role})
     const sourceCode=editorRef.current.getValue();
     if(!sourceCode) return;
     try{
-      setIsLoadIng(true)
-      console.log("called to api");
-      const {run:result} =await executeCode(language,sourceCode,input);
-      setOutput(result.output.split("\n"));
-      result.stderr?setError(true):setError(false)
+      setIsLoading(true)
+      socketRef.current.emit("execute", {
+          roomId
+      });
     }catch(err){
-      // console.log(err)
       toast({
         title:"An Error Occured",
         description:err.message || "unable to run the code",
@@ -26,7 +21,7 @@ export default function Run({language,editorRef,setOutput,input,setError, role})
         duration:6000
       })
     }finally{
-     setIsLoadIng(false)
+     
     }
   }
     return (

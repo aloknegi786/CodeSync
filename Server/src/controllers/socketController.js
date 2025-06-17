@@ -1,8 +1,8 @@
 import { roomUsers, roomDetails } from '../models/RoomStore.js';
 import { ACTIONS } from '../utils/Actions.js';
-import {LANGUAGE_VERSIONS, CODE_SNIPPETS} from '../utils/languageInfo.js';
+import { CODE_SNIPPETS} from '../utils/languageInfo.js';
 
-import { fetchRoomStatus } from './roomStatusController.js';
+import { executeCode } from './executionController.js';
 
 export function registerSocketHandlers(io, socket) {
   console.log('socket connected ', socket.id);
@@ -22,7 +22,8 @@ export function registerSocketHandlers(io, socket) {
         language: "java",
         code: CODE_SNIPPETS["java"],
         input: "",
-        output: ""
+        output: "",
+        isError: false,
       });
     }
 
@@ -53,7 +54,6 @@ export function registerSocketHandlers(io, socket) {
   socket.on("language_change", ({ language, roomId }) => {
       if (socket.data.role !== "host") return;
 
-      console.log(language);
       roomDetails.set(roomId, {
           host: socket.id,
           language,
@@ -72,6 +72,37 @@ export function registerSocketHandlers(io, socket) {
       console.log("Language: ",language);
   });
 
+  socket.on("execute", async ({roomId})=> {
+      if (socket.data.role !== "host") return;
+
+      const roomDetail = roomDetails.get(roomId);
+        if (!roomDetail) {
+          console.error(`No room found with ID ${roomId}`);
+          return;
+        }
+
+      const {run:result} = await executeCode(roomDetail.language, roomDetail.code, roomDetail.input);
+      roomDetail.output = result.output.split("\n");
+      
+      if(result.stderr){
+        roomDetail.isError = true;
+      }
+      else{
+        roomDetail.isError = false;
+      }
+
+      io.to(roomId).emit("output_change", {output: roomDetail.output, isError: roomDetail.isError});
+  });
+
+  socket.on("input_change", ({ input, roomId }) => {
+    if (socket.data.role !== "host" && socket.data.role !== "editor") return;
+
+    const roomDetail = roomDetails.get(roomId);
+    if (!roomDetail) return;
+
+    roomDetail.input = input;
+    io.to(roomId).emit("input_change", {newInput: input});
+  });
 
   socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
     const room = roomUsers.get(roomId);
@@ -123,6 +154,8 @@ export function registerSocketHandlers(io, socket) {
   socket.on(ACTIONS.SYNC_CODE, ({ socketId, roomId }) => {
     const roomDetail = roomDetails.get(roomId);
     io.to(socketId).emit(ACTIONS.CODE_CHANGE, {code: roomDetail.code});
+    io.to(socketId).emit("output_change", {output: roomDetail.output, isError: roomDetail.isError});
+    io.to(socketId).emit("input_change", {newInput: roomDetail.input});
   });
 
   socket.on("disconnect", () => {

@@ -7,10 +7,8 @@ import { initSocket, resetSocket } from '../socket';
 import ACTIONS from '../Actions';
 import toast from 'react-hot-toast';
 import 'react-toastify/dist/ReactToastify.css';
-// import OutputPanel from '../components/OutputPanel';
 import { Box } from '@chakra-ui/react';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
-// import '../components/spli'
 
 import {
   LiveblocksProvider,
@@ -27,6 +25,7 @@ function EditorPage() {
     const reactNavigator = useNavigate();
     const { roomId } = useParams();
     const [output, setOutput] = useState('click "Run" to run the code')
+    const [isLoading, setIsLoading] = useState(false);
     const [input, setInput] = useState('')
     const [error, setError] = useState(false)
     
@@ -70,8 +69,17 @@ function EditorPage() {
                 setClients(clients);
             });
 
+            socketRef.current.on("input_change", ({newInput}) => {
+                setInput(newInput);
+            });
+
+            socketRef.current.on("output_change", ({output, isError}) => {
+                setOutput(output);
+                setError(isError);
+                setIsLoading(false);
+            });
+
             socketRef.current.on("notification", ({message}) => {
-                console.log(message);
                 toast(message);
             });
 
@@ -96,6 +104,8 @@ function EditorPage() {
                 socketRef.current.disconnect();
                 socketRef.current.off(ACTIONS.JOINED);
                 socketRef.current.off(ACTIONS.DISCONNECTED);
+                socketRef.current.off("output_change");
+                socketRef.current.off("input_change");
                 socketRef.current.off('connect_error');
                 socketRef.current.off('connect_failed');
                 resetSocket();
@@ -152,7 +162,6 @@ function EditorPage() {
     }
 
     function promote(socketId, userRole) {
-        console.log("promotion process pending");
         if(role !== "host" || userRole != "pending"){
             return ;
         }
@@ -302,6 +311,8 @@ function EditorPage() {
                                         setOutput={setOutput} 
                                         input={input} 
                                         setError={setError}
+                                        isLoading={isLoading}
+                                        setIsLoading = {setIsLoading}
                                     />
                             </Box>
                             </div>
@@ -316,7 +327,7 @@ function EditorPage() {
                                         color="white"
                                         p={4}
                                         >
-                                        <OutputInput output={output} setInput={setInput} error={error} role={role} />
+                                        <OutputInput output={output} input={input} setInput={setInput} error={error} role={role} socketRef={socketRef} roomId={roomId} />
                                     </Box>
                             </div>
                         </div>

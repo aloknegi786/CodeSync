@@ -5,7 +5,6 @@ import {
     MenuItem,Button,
    Box,Flex,
   } from '@chakra-ui/react'
-import { useEffect,useState } from 'react';
 import { LANGUAGE_VERSIONS } from '../languageInfo'
 import LanuageInfo from './LanguageInfo'
 import ResetCode from './ResetCode'

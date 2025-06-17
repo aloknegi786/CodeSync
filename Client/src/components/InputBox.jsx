@@ -1,6 +1,14 @@
 import { Box, Text, Textarea } from "@chakra-ui/react";
 
-export default function InputBox({setInput,input, role}){
+export default function InputBox({setInput,input, role, socketRef, roomId}){
+    function publishInput(e){
+        socketRef.current.emit("input_change", {
+            roomId,
+            input: e.target.value,
+        });
+
+    }
+
     return (
         <>
         <Box 
@@ -14,11 +22,11 @@ export default function InputBox({setInput,input, role}){
                 flex="1"
                 resize="none"
                 overflow="auto"
-                placeholder="Give input here...."
+                placeholder={input}
                 size="sm"
                 marginBottom='2'
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => publishInput(e)}
                 isReadOnly={role === "viewer" || role === "pending"}
                 sx={{
                     '&::-webkit-scrollbar': {

@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import Editor from '@monaco-editor/react';
 import ACTIONS from '../Actions';
-import { CODE_SNIPPETS } from '../languageInfo';
 import LanguageSelector from './languageSelector';
 import Run from './run';
 
-const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEditorInstance, setOutput,setInput,input,output,setError,error}, ref) => {
+const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEditorInstance, setOutput,setInput,input,output,setError,error, isLoading, setIsLoading}, ref) => {
   const editorRef = useRef(null);
-  var statusNode = useRef(null);
   const [value,setValue]=useState('');
   const [language,setLanguage]=useState("java")
   const [fntSize,setFntsize]=useState("16px  ")
@@ -140,7 +138,6 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
         height="85%"
         theme="vs-dark"
         language={language}
-        defaultValue={CODE_SNIPPETS[language]}
         value={value}
         onMount={handleEditorDidMount}
         onChange={(value) => handleEditorChange(value)}
@@ -161,6 +158,10 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
           input={input}
           setError={setError}
           role={role}
+          socketRef={socketRef}
+          roomId={roomId}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
         />
       )}
     </div>
