@@ -17,6 +17,38 @@ export const LANGUAGE_VERSIONS={
     bash:'5.2.0',
 }
 
+export const CODE_SNIPPETS = {
+    javascript: `function welcome() {\n\tconsole.log("Welcome to CodeSync!");\n}\n\nwelcome();\n`,
+  
+    typescript: `type Params = {\n\tmessage: string;\n}\n\nfunction welcome(data: Params) {\n\tconsole.log(data.message);\n}\n\nwelcome({ message: "Welcome to CodeSync!" });\n`,
+  
+    python: `def welcome():\n\tprint("Welcome to CodeSync!")\n\nwelcome()\n`,
+  
+    java: `import java.util.*;\nimport java.io.*;\n\npublic class Welcome {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Welcome to CodeSync!");\n\t}\n}\n`,
+  
+    csharp: `using System;\nusing System.Collections.Generic;\n\nnamespace CodeEditor\n{\n\tclass Welcome {\n\t\tstatic void Main(string[] args) {\n\t\t\tConsole.WriteLine("Welcome to CodeSync!");\n\t\t}\n\t}\n}\n`,
+  
+    php: `<?php\n\necho "Welcome to CodeSync!";\n`,
+  
+    cpp: `#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n\tcout << "Welcome to CodeSync!" << endl;\n\treturn 0;\n}\n`,
+
+    c: `#include <stdio.h>\n\nint main() {\n\tprintf("Welcome to CodeSync");\n\treturn 0;\n}\n`,
+  
+    ruby: `def welcome\n\tputs "Welcome to CodeSync!"\nend\n\nwelcome()\n`,
+  
+    go: `package main\nimport "fmt"\n\nfunc welcome() {\n\tfmt.Println("Welcome to CodeSync!")\n}\n\nfunc main() {\n\twelcome()\n}\n`,
+  
+    rust: `fn welcome() {\n\tprintln!("Welcome to CodeSync!");\n}\n\nfn main() {\n\twelcome();\n}\n`,
+  
+    kotlin: `import java.util.*;\n\nfun welcome() {\n\tprintln("Welcome to CodeSync!")\n}\n\nfun main() {\n\twelcome()\n}\n`,
+  
+    swift: `import Foundation\n\nfunc welcome() {\n\tprint("Welcome to CodeSync")\n}\n\nwelcome()\n`,
+  
+    perl: `use List::Util qw(shuffle);\n\nsub welcome {\n\tprint "Welcome to CodeSync!\\n";\n}\n\nwelcome();\n`,
+  
+    bash: `#!/bin/bash\n\necho "Welcome to CodeSync!"\n`,
+  };
+  
   export const LANGUAGE_INFO = {
     cpp: {
       version: 'C++ (10.2.0)',

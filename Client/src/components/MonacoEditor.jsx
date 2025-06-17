@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import Editor from '@monaco-editor/react';
 import ACTIONS from '../Actions';
-import { CODE_SNIPPETS } from '../languageInfo';
 import LanguageSelector from './languageSelector';
 import Run from './run';
 
-const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEditorInstance, setOutput,setInput,input,output,setError,error}, ref) => {
+const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEditorInstance, setOutput,setInput,input,output,setError,error, isLoading, setIsLoading}, ref) => {
   const editorRef = useRef(null);
-  var statusNode = useRef(null);
   const [value,setValue]=useState('');
   const [language,setLanguage]=useState("java")
   const [fntSize,setFntsize]=useState("16px  ")
@@ -19,6 +17,10 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
   const handleEditorDidMount = (editor) => {
     editorRef.current = editor;
     setEditorInstance?.(editor);
+    socketRef.current.emit(ACTIONS.SYNC_CODE, {
+      socketId: socketRef.current.id,
+      roomId
+    });
     editorRef.current.updateOptions({
       readOnly: role === 'viewer' || role === 'pending',
     });
@@ -48,12 +50,19 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
           }
         }
       });
+
+      socketRef.current.on("language_updated", ({language})=> {
+          setLanguage(language);
+          setLoadedCode(null);
+          setOutput('')
+          setError(false)
+      });
     }
 
     return () => {
       socketRef.current?.off(ACTIONS.CODE_CHANGE);
     };
-  }, []);
+  }, [socketRef.current]);
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -94,36 +103,15 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
     setTbsize(tbSize);
   }
 
-  async function handleLanguageChange(languageSent,reset, value=null){
-    if(value === null){
-      if(reset == "reset"){
+  async function handleLanguageChange(languageSent,reset){
+    if(reset === "reset"){
         setLoadedCode(null);
-        setLanguage(languageSent);
-        setValue(CODE_SNIPPETS[languageSent]);
-      }
-      else if(languageSent !== language){
-        setLoadedCode(null);
-        setLanguage(languageSent);
-        setValue(CODE_SNIPPETS[languageSent]);
-        setOutput('')
-        setError(false)
-      }
     }
-    else {
-      if(reset === 'Ai'){
-        setValue(value);
-        setLoadedCode(null);
-        setLanguage(languageSent);
-      }
-      else{
-        // const docSnap = await getDoc(doc(db, "code", value));
-        // setValue(docSnap.data().code);
-        // setLanguage(languageSent);
-        // setLoadedCode(value);
-        // setOutput('');
-        // setError(false);
-      }
-    }
+    
+    socketRef.current.emit("language_change", {
+      language: languageSent,
+      roomId,
+    });
   }
 
   return (
@@ -150,7 +138,6 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
         height="85%"
         theme="vs-dark"
         language={language}
-        defaultValue={CODE_SNIPPETS[language]}
         value={value}
         onMount={handleEditorDidMount}
         onChange={(value) => handleEditorChange(value)}
@@ -171,6 +158,10 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
           input={input}
           setError={setError}
           role={role}
+          socketRef={socketRef}
+          roomId={roomId}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
         />
       )}
     </div>
