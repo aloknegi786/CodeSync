@@ -12,6 +12,13 @@ app.use(express.json());
 const server = http.createServer(app);
 setupSocketServer(server);
 
+app.get('/', (req, res) => {
+  res.send({
+    activeStatus: true,
+    error: false,
+  })
+});
+
 server.listen(PORT, () => {
   console.log(`Listening on port ${PORT}...`);
 });
