@@ -26,6 +26,7 @@ function EditorPage() {
     const { roomId } = useParams();
     const [output, setOutput] = useState('click "Run" to run the code')
     const [isLoading, setIsLoading] = useState(false);
+    const [socket, setSocket] = useState(false);
     const [input, setInput] = useState('')
     const [error, setError] = useState(false)
     
@@ -116,7 +117,7 @@ function EditorPage() {
 
     useEffect(() => {
         if (!socketRef.current) return;
-
+        setSocket(true);
         const handleCodeChange = ({ code }) => {
             if (code != null && editorRef.current) {
                 const currentCode = editorRef.current.getValue();
@@ -299,7 +300,7 @@ function EditorPage() {
                                 borderRadius="10"
                                 mt='2'
                                 ml='0.5'
-                                > { socketRef?.current &&                                      
+                                > { socket &&                                      
                                     (<MonacoEditor
                                         socketRef={socketRef}
                                         roomId={roomId}
