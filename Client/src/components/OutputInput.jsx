@@ -2,7 +2,7 @@ import { Box} from "@chakra-ui/react";
 import InputBox from "./InputBox";
 import OutputBox from "./OutputBox";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
-import "./Splitter.css";
+import "./splitter.css";
 
 export default function OutputInput({output, setInput, error,input, role, socketRef, roomId}) {
   return (
