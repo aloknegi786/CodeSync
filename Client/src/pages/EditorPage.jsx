@@ -299,8 +299,8 @@ function EditorPage() {
                                 borderRadius="10"
                                 mt='2'
                                 ml='0.5'
-                                >                                        
-                                    <MonacoEditor
+                                > { socketRef?.current &&                                      
+                                    (<MonacoEditor
                                         socketRef={socketRef}
                                         roomId={roomId}
                                         onCodeChange={(code) => {
@@ -313,7 +313,8 @@ function EditorPage() {
                                         setError={setError}
                                         isLoading={isLoading}
                                         setIsLoading = {setIsLoading}
-                                    />
+                                    />)
+                                    }
                             </Box>
                             </div>
 

@@ -82,7 +82,7 @@ export function registerSocketHandlers(io, socket) {
         }
 
       const {run:result} = await executeCode(roomDetail.language, roomDetail.code, roomDetail.input);
-      roomDetail.output = result.output.split("\n");
+      roomDetail.output = result?.output?.split("\n");
       
       if(result.stderr){
         roomDetail.isError = true;
