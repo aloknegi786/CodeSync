@@ -6,6 +6,7 @@ export default function useRoomEvents({
   socketRef,
   roomId,
   username,
+  email,
   setClients,
   setRole,
   navigate
@@ -17,16 +18,17 @@ export default function useRoomEvents({
 
     socketRef.current.emit(ACTIONS.JOIN, {
       roomId,
-      username
+      username,
+      email
     });
 
-    socketRef.current.on(ACTIONS.JOINED, ({ clients, username: joinedUser, Role, action }) => {
+    socketRef.current.on(ACTIONS.JOINED, ({ clients, username: joinedUser, email: joinedEmail, Role, action }) => {
 
-      if(!(joinedUser === username && action === "promoted as editor")){
+      if(!(joinedEmail === email && action === "promoted as editor")){
         toast.success(`${joinedUser} ${action}`);
       }
 
-      const currentUser = clients.find(c => c.username === username);
+      const currentUser = clients.find(c => c.email === email);
       if (currentUser) {  
         setRole(currentUser.role);
         currentUser.username = "You";

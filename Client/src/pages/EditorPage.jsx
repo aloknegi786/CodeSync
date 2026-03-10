@@ -12,16 +12,33 @@ import useEditorSync from "../hooks/useEditorSync";
 
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { toast } from "react-hot-toast";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../lib/firebase";
 
 function EditorPage() {
 
   const location = useLocation();
   const navigate = useNavigate();
   const { roomId } = useParams();
+  const [user, setUser] = useState(undefined);
 
-  if (!location.state) return <Navigate to="/" />;
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      if (!u) {
+        setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+      } else {
+        setUser(u);
+      }
+    });
+
+    return unsubscribe;
+  }, [navigate]);
+
 
   const username = location.state.username;
+  const email = location.state.email;
 
   const [clients, setClients] = useState([]);
   const [role, setRole] = useState("viewer");
@@ -47,6 +64,7 @@ function EditorPage() {
     socketRef,
     roomId,
     username,
+    email,
     setClients,
     setRole,
     navigate
@@ -77,18 +95,20 @@ function EditorPage() {
 
         socketRef.current.emit(ACTIONS.REQUEST_PROMOTION, {
             roomId,
-            username
+            username,
+            email,
         });
     }
 
-    function promote(socketId, userRole) {
+    function promote(socketId, userRole, email) {
         if(role !== "host" || userRole != "pending"){
             return ;
         }
 
         socketRef.current.emit(ACTIONS.PROMOTE, {
             roomId,
-            socketId
+            socketId,
+            email,
         });
     }
 
@@ -97,9 +117,10 @@ function EditorPage() {
         try {
 
             if (socketRef.current?.connected) {
-                socketRef.current.emit(ACTIONS.DISCONNECT, {
+                socketRef.current.emit(ACTIONS.LEAVE, {
                     roomId,
-                    username
+                    username,
+                    email,
                 });
             }
 
@@ -110,6 +131,13 @@ function EditorPage() {
             navigate("/join-room");
         }
     }
+
+  
+  if (user === undefined) {
+    return null;
+  }
+
+  if (!location.state) return <Navigate to="/" />;
 
   if (!isConnected) {
     return (
