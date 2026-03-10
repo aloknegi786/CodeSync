@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import signInWithGoogle from "../lib/signInWithGoogle";
+import { auth } from "../lib/firebase";
+import toast from "react-hot-toast";
 import "./styles/LoginPage.css";
 
 const DNAIcon = () => (
@@ -35,9 +37,17 @@ export default function Login() {
     setLoading(true);
     try {
       await signInWithGoogle();
+      const user = auth.currentUser;
+      if (!user){
+        toast.error("Google sign-in failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+      toast.success("Google sign-in successful!");
       navigate("/join-room");
     } catch (err) {
       console.error(err);
+      toast.error("Google sign-in failed. Please try again.");
       setLoading(false);
     }
   };

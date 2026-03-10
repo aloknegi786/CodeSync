@@ -158,3 +158,25 @@
   padding-top: 20px;
  }
 
+ .logoutBtn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background-color: #dc2626;
+}
+
+.topActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;       
+  margin-bottom: 20px;
+}
+
