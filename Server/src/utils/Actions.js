@@ -15,5 +15,6 @@ export const ACTIONS = {
     LANGUAGE_UPDATED: 'language_updated', 
     NOTIFICATION: 'notification',
     DISCONNECT: 'disconnect',
-    CLOSE: 'close',                       
+    CLOSE: 'close',    
+    ERROR: 'action-error',                   
 };

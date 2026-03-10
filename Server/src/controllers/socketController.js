@@ -2,7 +2,7 @@ import { roomUsers, roomDetails } from '../models/RoomStore.js';
 import { ACTIONS } from '../utils/Actions.js';
 import { CODE_SNIPPETS} from '../utils/languageInfo.js';
 
-import { executeCode } from './executionController.js';
+import { runCode } from './executionController.js';
 
 export function registerSocketHandlers(io, socket) {
   console.log('socket connected ', socket.id);
@@ -24,6 +24,7 @@ export function registerSocketHandlers(io, socket) {
         input: "",
         output: "",
         isError: false,
+        isExecuting: false,
       });
     }
 
@@ -73,6 +74,8 @@ export function registerSocketHandlers(io, socket) {
   });
 
   socket.on(ACTIONS.EXECUTE, async ({roomId})=> {
+      console.log("Execute code for room: ", roomId);
+      console.log("Room details: ", roomDetails.get(roomId));
       if (socket.data.role !== "host") return;
 
       const roomDetail = roomDetails.get(roomId);
@@ -81,16 +84,31 @@ export function registerSocketHandlers(io, socket) {
           return;
         }
 
-      const {run:result} = await executeCode(roomDetail.language, roomDetail.code, roomDetail.input);
-      roomDetail.output = result?.output?.split("\n");
-      
-      if(result.stderr){
+      if(roomDetail.isExecuting) {
+        io.to(roomId).emit(ACTIONS.ERROR, {
+          message: "Code is already executing. Please wait."
+        });
+        return;
+      }
+      roomDetail.isExecuting = true;
+
+      try {
+        const output = await runCode(
+          roomDetail.language,
+          roomDetail.code,
+          roomDetail.input
+        );
+
+        roomDetail.output = output.trim().split("\n");
+        roomDetail.isError = false;
+
+      } catch (err) {
+        roomDetail.output = [err.message];
         roomDetail.isError = true;
       }
-      else{
-        roomDetail.isError = false;
-      }
 
+      roomDetail.isExecuting = false;
+      console.log("Execution output: ", roomDetail.output);
       io.to(roomId).emit(ACTIONS.OUTPUT_CHANGE, {output: roomDetail.output, isError: roomDetail.isError});
   });
 

@@ -9,9 +9,10 @@ export async function executeCode(language, sourceCode, input) {
   try {
     const response = await API.post("/execute", {
       language,
-      version: LANGUAGE_VERSIONS[language],
+      version: LANGUAGE_VERSIONS[language] || "*",
       files: [
         {
+          name: "main",
           content: sourceCode,
         },
       ],
