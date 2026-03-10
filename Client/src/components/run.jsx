@@ -9,7 +9,6 @@ export default function Run({language,editorRef,setOutput,input,setError, role, 
     const sourceCode=editorRef.current.getValue();
     if(!sourceCode) return;
     try{
-      console.log(sourceCode);
       setIsLoading(true)
       socketRef.current.emit("execute", {
           roomId
