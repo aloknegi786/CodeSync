@@ -33,7 +33,7 @@ export function registerSocketHandlers(io, socket) {
       role: socket.data.role
     });
 
-    sendUserList(roomId, username);
+    sendUserList(roomId, username, "joined");
   });
 
   socket.on(ACTIONS.REQUEST_PROMOTION, ({ roomId, username }) => {
@@ -49,7 +49,7 @@ export function registerSocketHandlers(io, socket) {
       }
     }
 
-    sendUserList(roomId, username);
+    sendUserList(roomId, username, "requested promotion");
   });
 
   socket.on(ACTIONS.LANGUAGE_CHANGE, ({ language, roomId }) => {
@@ -138,6 +138,7 @@ export function registerSocketHandlers(io, socket) {
     }
 
     const roomDetail = roomDetails.get(roomId);
+    if(!roomDetail) return;
     roomDetail.code = code;
     socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
   });
@@ -166,14 +167,14 @@ export function registerSocketHandlers(io, socket) {
       message: "You have been promoted as editor."
     });
 
-    sendUserList(roomId, socket.data.username);
+    sendUserList(roomId, socket.data.username, "promoted as editor");
   });
 
   socket.on(ACTIONS.SYNC_CODE, ({ socketId, roomId }) => {
     const roomDetail = roomDetails.get(roomId);
-    io.to(socketId).emit(ACTIONS.CODE_CHANGE, {code: roomDetail.code});
-    io.to(socketId).emit(ACTIONS.OUTPUT_CHANGE, {output: roomDetail.output, isError: roomDetail.isError});
-    io.to(socketId).emit(ACTIONS.INPUT_CHANGE, {newInput: roomDetail.input});
+    io.to(socketId).emit(ACTIONS.CODE_CHANGE, {code: roomDetail.code || ""});
+    io.to(socketId).emit(ACTIONS.OUTPUT_CHANGE, {output: roomDetail.output || "", isError: roomDetail.isError});
+    io.to(socketId).emit(ACTIONS.INPUT_CHANGE, {newInput: roomDetail.input || ""});
   });
 
   socket.on(ACTIONS.DISCONNECT, () => {
@@ -194,12 +195,12 @@ export function registerSocketHandlers(io, socket) {
           roomDetails.delete(roomId);
         }, 2000);
       } else {
-        sendUserList(roomId);
+        sendUserList(roomId, socket.data.username, "left");
       }
     }
   });
 
-  function sendUserList(roomId, username = "") {
+  function sendUserList(roomId, username = "", action = "joined") {
     const clients = [];
     if (roomUsers.has(roomId)) {
       for (const [socketId, data] of roomUsers.get(roomId).entries()) {
@@ -207,9 +208,10 @@ export function registerSocketHandlers(io, socket) {
       }
       io.in(roomId).emit(ACTIONS.JOINED, {
         clients,
-        username,
+        username: username,
         Role: socket.data.role,
         socketId: socket.id,
+        action: action
       });
     }
   }

@@ -4,6 +4,8 @@ import { Toaster } from 'react-hot-toast';
 
 import Home from './pages/Home'
 import EditorPage from './pages/EditorPage';
+import Login from './pages/LoginPge';
+import AuthGuard from './lib/authGuard.jsx';
 
 function App() {
 
@@ -22,10 +24,15 @@ function App() {
         ></Toaster>
       </div>
       <BrowserRouter>
-          <Routes>
-              <Route path='/' element = {<Home />}/>
-              <Route path='/editor/:roomId' element = {<EditorPage/>}/>
-          </Routes>
+        <Routes>
+          <Route path="/" element={<Login />} />
+
+          <Route element={<AuthGuard />}>
+              <Route path="/join-room" element={<Home />} />
+              <Route path="/editor/:roomId" element={<EditorPage />} />
+          </Route>
+
+        </Routes>
       </BrowserRouter>
     </>
   );

@@ -65,10 +65,6 @@ export async function executeCode(language, code, input = "") {
     runCommand
   ];
 
-  console.log("Execution folder:", dir);
-  console.log("Files:", await fs.readdir(dir));
-  console.log("Docker args:", args);
-
   return new Promise((resolve) => {
 
     const proc = spawn("docker", args, {

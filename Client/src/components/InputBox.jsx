@@ -22,7 +22,7 @@ export default function InputBox({setInput,input, role, socketRef, roomId}){
                 flex="1"
                 resize="none"
                 overflow="auto"
-                placeholder={input}
+                placeholder={input || "Enter input for the code here..."}
                 size="sm"
                 marginBottom='2'
                 value={input}

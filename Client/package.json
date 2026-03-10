@@ -25,6 +25,7 @@
     "axios": "^1.9.0",
     "codemirror": "^5.65.19",
     "express": "^5.1.0",
+    "firebase": "^12.10.0",
     "flowbite-react": "^0.11.7",
     "lucide-react": "^0.514.0",
     "primeicons": "^7.0.0",

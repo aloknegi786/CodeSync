@@ -1,4 +1,4 @@
-import { Button,Box,Flex, useToast} from "@chakra-ui/react";
+import { Button,Box,Flex, useToast, shouldForwardProp} from "@chakra-ui/react";
 
 export default function Run({language,editorRef,setOutput,input,setError, role, socketRef, roomId, isLoading, setIsLoading}){
   const toast=useToast();
@@ -9,6 +9,7 @@ export default function Run({language,editorRef,setOutput,input,setError, role, 
     const sourceCode=editorRef.current.getValue();
     if(!sourceCode) return;
     try{
+      console.log(sourceCode);
       setIsLoading(true)
       socketRef.current.emit("execute", {
           roomId

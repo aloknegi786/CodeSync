@@ -1,0 +1,324 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:        #161c24;
+  --surface:   #1e2730;
+  --card:      #242e3a;
+  --border:    #2e3d4f;
+  --green:     #4ade80;
+  --green-dim: #22c55e;
+  --text:      #e2e8f0;
+  --muted:     #6b7f93;
+  --mono:      'Space Mono', monospace;
+  --sans:      'DM Sans', sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  font-family: var(--sans);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── PAGE ── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+}
+
+.page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(74, 222, 128, 0.055) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+.page::after {
+  content: '';
+  position: fixed;
+  bottom: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(74, 222, 128, 0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── CARD ── */
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 36px 32px;
+  box-shadow:
+    0 0 0 1px rgba(74, 222, 128, 0.05),
+    0 32px 64px rgba(0, 0, 0, 0.55);
+  animation: cardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 44px;
+  right: 44px;
+  height: 1.5px;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  opacity: 0.55;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  animation: fadeDown 0.4s 0.08s ease both;
+}
+
+.divider-v {
+  width: 1px;
+  height: 44px;
+  background: var(--border);
+}
+
+.brand-name {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+}
+
+.brand-tagline {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--green);
+  letter-spacing: 0.4px;
+  margin-top: 3px;
+}
+
+/* ── STATS ── */
+.stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  animation: fadeDown 0.4s 0.14s ease both;
+}
+
+.stat {
+  flex: 1;
+  padding: 12px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.stat:hover {
+  border-color: rgba(74, 222, 128, 0.25);
+}
+
+.stat-val {
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--green);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+}
+
+/* ── PILLS ── */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 26px;
+  animation: fadeDown 0.4s 0.19s ease both;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  background: rgba(74, 222, 128, 0.07);
+  border: 1px solid rgba(74, 222, 128, 0.16);
+  border-radius: 100px;
+  font-size: 11.5px;
+  color: var(--green);
+  font-weight: 500;
+}
+
+.pill-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  opacity: 0.65;
+}
+
+/* ── FIELD LABEL ── */
+.field-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 14px;
+  letter-spacing: 0.2px;
+  animation: fadeDown 0.4s 0.22s ease both;
+}
+
+/* ── GOOGLE BUTTON ── */
+.google-btn {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s, background 0.2s;
+  overflow: hidden;
+  animation: fadeDown 0.4s 0.26s ease both;
+  letter-spacing: 0.1px;
+}
+
+.google-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(74, 222, 128, 0.05));
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.google-btn:hover {
+  border-color: rgba(74, 222, 128, 0.45);
+  background: rgba(30, 39, 48, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(74, 222, 128, 0.12);
+}
+
+.google-btn:hover::after {
+  opacity: 1;
+}
+
+.google-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.google-btn.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* ── CARD FOOTER ── */
+.card-foot {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.4px;
+  animation: fadeDown 0.4s 0.3s ease both;
+}
+
+/* ── PAGE FOOTER ── */
+.page-foot {
+  position: relative;
+  z-index: 1;
+  margin-top: 28px;
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: fadeDown 0.4s 0.42s ease both;
+}
+
+.page-foot a {
+  color: var(--green);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.page-foot a:hover {
+  text-decoration: underline;
+}
+
+/* ── SPINNER ── */
+.spinner {
+  width: 17px;
+  height: 17px;
+  border: 2px solid rgba(226, 232, 240, 0.18);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ── KEYFRAMES ── */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
