@@ -3,11 +3,12 @@ import Editor from '@monaco-editor/react';
 import ACTIONS from '../Actions';
 import LanguageSelector from './languageSelector';
 import Run from './run';
+import { CODE_SNIPPETS } from '../languageInfo';
 
 const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEditorInstance, setOutput,setInput,input,output,setError,error, isLoading, setIsLoading}, ref) => {
   const editorRef = useRef(null);
-  const [value,setValue]=useState('');
   const [language,setLanguage]=useState("java")
+  const [value,setValue]=useState(CODE_SNIPPETS[language]);
   const [fntSize,setFntsize]=useState("16px  ")
   const [tbSize,setTbsize]=useState("2 spaces");
   const [wordWrap,setWordWrap]=useState('off')
@@ -17,10 +18,14 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
   const handleEditorDidMount = (editor) => {
     editorRef.current = editor;
     setEditorInstance?.(editor);
+
+    if(!socketRef?.current) return;
+
     socketRef.current.emit(ACTIONS.SYNC_CODE, {
       socketId: socketRef.current.id,
       roomId
     });
+    console.log("Updating editor readOnly state based on role:", role);
     editorRef.current.updateOptions({
       readOnly: role === 'viewer' || role === 'pending',
     });
@@ -28,6 +33,8 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
 
   const handleEditorChange = (value) => {
     if (value === undefined) return;
+
+    if(!socketRef?.current) return;
 
     if (role === 'host' || role === 'editor') {
       onCodeChange(value);
@@ -66,6 +73,7 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
 
   useEffect(() => {
     if (!editorRef.current) return;
+    console.log("Updating editor readOnly state based on role:", role);
       editorRef.current.updateOptions({
         readOnly: role === 'viewer' || role === 'pending',
       });
@@ -107,6 +115,10 @@ const MonacoEditor = forwardRef(({ socketRef, roomId, onCodeChange, role, setEdi
     if(reset === "reset"){
         setLoadedCode(null);
     }
+
+    if(languageSent === language) return;
+
+    if(!socketRef?.current) return;
     
     socketRef.current.emit("language_change", {
       language: languageSent,
