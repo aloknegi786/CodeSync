@@ -1,8 +1,8 @@
 import { roomUsers, roomDetails } from '../models/RoomStore.js';
 import { ACTIONS } from '../utils/Actions.js';
-import { CODE_SNIPPETS} from '../utils/languageInfo.js';
-
+import { CODE_SNIPPETS } from '../utils/languageInfo.js';
 import { runCode } from './executionController.js';
+import * as Y from 'yjs';
 
 export function registerSocketHandlers(io, socket) {
   console.log('socket connected ', socket.id);
@@ -17,10 +17,15 @@ export function registerSocketHandlers(io, socket) {
       roomUsers.set(roomId, new Map());
       socket.data.role = "host";
 
+      // --- YJS INTEGRATION: Initialize the Y.Doc ---
+      const ydoc = new Y.Doc();
+      const ytext = ydoc.getText('monaco');
+      ytext.insert(0, CODE_SNIPPETS["java"]);
+
       roomDetails.set(roomId, {
         host: socket.id,
         language: "java",
-        code: CODE_SNIPPETS["java"],
+        ydoc: ydoc, 
         input: "",
         output: "",
         isError: false,
@@ -48,41 +53,33 @@ export function registerSocketHandlers(io, socket) {
         break;
       }
     }
-
     sendUserList(roomId, username, "requested promotion");
   });
 
   socket.on(ACTIONS.LANGUAGE_CHANGE, ({ language, roomId }) => {
       if (socket.data.role !== "host") return;
 
-      roomDetails.set(roomId, {
-          host: socket.id,
-          language,
-          code: CODE_SNIPPETS[language],
-          input: "",
-          output: ""
-      });
-
       const roomDetail = roomDetails.get(roomId);
-      io.to(roomId).emit(ACTIONS.CODE_CHANGE, {
-        code : roomDetail.code,
-      });
-      io.to(roomId).emit("language_updated", {
-        language,
-      });
-      console.log("Language: ",language);
+      if (!roomDetail) return;
+
+      roomDetail.language = language;
+
+      // --- YJS INTEGRATION: Update the document ---
+      const ytext = roomDetail.ydoc.getText('monaco');
+      ytext.delete(0, ytext.length); // Clear old code
+      ytext.insert(0, CODE_SNIPPETS[language]);
+
+      const update = Y.encodeStateAsUpdate(roomDetail.ydoc);
+      io.to(roomId).emit('yjs_update', update);
+
+      io.to(roomId).emit("language_updated", { language });
   });
 
   socket.on(ACTIONS.EXECUTE, async ({roomId})=> {
-      console.log("Execute code for room: ", roomId);
-      console.log("Room details: ", roomDetails.get(roomId));
       if (socket.data.role !== "host") return;
 
       const roomDetail = roomDetails.get(roomId);
-        if (!roomDetail) {
-          console.error(`No room found with ID ${roomId}`);
-          return;
-        }
+      if (!roomDetail) return;
 
       if(roomDetail.isExecuting) {
         io.to(roomId).emit(ACTIONS.ERROR, {
@@ -92,37 +89,37 @@ export function registerSocketHandlers(io, socket) {
       }
       roomDetail.isExecuting = true;
 
+      // --- YJS INTEGRATION: Extract flat string for execution ---
+      const codeToExecute = roomDetail.ydoc.getText('monaco').toString();
+
       try {
         const output = await runCode(
           roomDetail.language,
-          roomDetail.code,
+          codeToExecute,
           roomDetail.input
         );
 
         roomDetail.output = output.trim().split("\n");
         roomDetail.isError = false;
-
       } catch (err) {
         roomDetail.output = [err.message];
         roomDetail.isError = true;
       }
 
       roomDetail.isExecuting = false;
-      console.log("Execution output: ", roomDetail.output);
       io.to(roomId).emit(ACTIONS.OUTPUT_CHANGE, {output: roomDetail.output, isError: roomDetail.isError});
   });
 
   socket.on(ACTIONS.INPUT_CHANGE, ({ input, roomId }) => {
     if (socket.data.role !== "host" && socket.data.role !== "editor") return;
-
     const roomDetail = roomDetails.get(roomId);
     if (!roomDetail) return;
-
     roomDetail.input = input;
     io.to(roomId).emit(ACTIONS.INPUT_CHANGE, {newInput: input});
   });
 
-  socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
+
+  socket.on('yjs_update', ({ roomId, update }) => {
     const room = roomUsers.get(roomId);
     if (!room) return;
     const user = room.get(socket.id);
@@ -131,7 +128,7 @@ export function registerSocketHandlers(io, socket) {
     socket.data.role = user.role;
 
     if (socket.data.role === 'viewer' || socket.data.role === 'pending') {
-      io.to(roomId).emit("action_error", {
+      io.to(socket.id).emit("action_error", {
         message: "Un-Authorized Action"
       });
       return;
@@ -139,57 +136,45 @@ export function registerSocketHandlers(io, socket) {
 
     const roomDetail = roomDetails.get(roomId);
     if(!roomDetail) return;
-    roomDetail.code = code;
-    socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
+
+    // 1. Apply the incoming delta to the server's master document
+    Y.applyUpdate(roomDetail.ydoc, new Uint8Array(update));
+
+    // 2. Broadcast the delta to everyone else in the room
+    socket.in(roomId).emit('yjs_update', update);
   });
 
   socket.on(ACTIONS.PROMOTE, ({ roomId, socketId }) => {
     const room = roomUsers.get(roomId);
-    if (!room || socket.data.role !== "host") {
-      io.to(socket.id).emit("action_error", {
-        message: "Invalid action"
-      });
-      return;
-    }
-
+    if (!room || socket.data.role !== "host") return io.to(socket.id).emit("action_error", { message: "Invalid action" });
     const user = room.get(socketId);
-    if (!user) {
-      io.to(socket.id).emit("action_error", {
-        message: "No such user"
-      });
-      return;
-    }
+    if (!user) return io.to(socket.id).emit("action_error", { message: "No such user" });
 
     user.role = "editor";
     room.set(socketId, user);
-
-    io.to(socketId).emit('notification', {
-      message: "You have been promoted as editor."
-    });
-
+    io.to(socketId).emit('notification', { message: "You have been promoted as editor." });
     sendUserList(roomId, socket.data.username, "promoted as editor");
   });
 
   socket.on(ACTIONS.SYNC_CODE, ({ socketId, roomId }) => {
     const roomDetail = roomDetails.get(roomId);
-    io.to(socketId).emit(ACTIONS.CODE_CHANGE, {code: roomDetail.code || ""});
+    if(!roomDetail) return;
+
+    const stateVector = Y.encodeStateAsUpdate(roomDetail.ydoc);
+    io.to(socketId).emit('yjs_initial_state', stateVector);
+    
     io.to(socketId).emit(ACTIONS.OUTPUT_CHANGE, {output: roomDetail.output || "", isError: roomDetail.isError});
     io.to(socketId).emit(ACTIONS.INPUT_CHANGE, {newInput: roomDetail.input || ""});
   });
 
   socket.on(ACTIONS.DISCONNECT, () => {
     const { roomId, role } = socket.data || {};
-
     if (roomUsers.has(roomId)) {
       const wasHost = role === "host";
-
       roomUsers.get(roomId).delete(socket.id);
 
       if (roomUsers.get(roomId).size === 0 || wasHost) {
-        io.to(roomId).emit(ACTIONS.CLOSE, {
-          message: "Host left! Room will be closed in 2s",
-        });
-
+        io.to(roomId).emit(ACTIONS.CLOSE, { message: "Host left! Room will be closed in 2s" });
         setTimeout(() => {
           roomUsers.delete(roomId);
           roomDetails.delete(roomId);
