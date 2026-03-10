@@ -1,26 +1,8 @@
-import axios from "axios";
-import { LANGUAGE_VERSIONS } from "../utils/languageInfo.js";
+import { executeCode } from "../runner/executeCode.js";
 
-const API = axios.create({
-  baseURL: "https://emkc.org/api/v2/piston",
-});
+export const runCode = async (language, code, input) => {
+  console.log("Running code with params: ", { language, code, input });
+  const output = await executeCode(language, code, input);
 
-export async function executeCode(language, code, input) {
-  try {
-    const response = await API.post("/execute", {
-      language,
-      version: LANGUAGE_VERSIONS[language],
-      files: [
-        {
-          content: code,
-        },
-      ],
-      stdin: input,
-    });
-
-    return response.data;
-  } catch (err) {
-    console.error("Execution failed:", err);
-    return { run: { stderr: "Execution error" } };
-  }
-}
+  return output;
+};
