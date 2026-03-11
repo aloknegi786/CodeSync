@@ -14,6 +14,7 @@ import { Splitter, SplitterPanel } from "primereact/splitter";
 import { toast } from "react-hot-toast";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../lib/firebase";
+import LoadingPage from "./LoadingPage";
 
 function EditorPage() {
 
@@ -141,9 +142,7 @@ function EditorPage() {
 
   if (!isConnected) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-2xl font-semibold">Connecting to server...</p>
-      </div>
+      <LoadingPage message="Connecting to server..." />
     );
   }
 

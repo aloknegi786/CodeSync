@@ -47,7 +47,7 @@ export default function useRoomEvents({
 
     socketRef.current.on(ACTIONS.CLOSE, ({ message }) => {
       toast.error(message);
-      setTimeout(() => navigate("/"), 2000);
+      setTimeout(() => navigate("/join-room"), 2000);
     });
 
     return () => {
