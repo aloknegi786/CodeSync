@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 export default function useSocket(navigate) {
 
   const socketRef = useRef(null);
-  const [isConnected, setIsConnected] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
 
@@ -16,28 +16,21 @@ export default function useSocket(navigate) {
     };
 
     const init = async () => {
+      const socket = await initSocket();
+      socketRef.current = socket;
 
-      socketRef.current = await initSocket();
+      socket.on("connect_error", handleErrors);
+      socket.on("connect_failed", handleErrors);
 
-      // Since initSocket waits for connection, we know it's connected
-      setIsConnected(true);
-
-      socketRef.current.on("disconnect", () => {
-        setIsConnected(false);
-      });
-
-      socketRef.current.on("connect_error", handleErrors);
-      socketRef.current.on("connect_failed", handleErrors);
+      setReady(true); 
     };
 
     init();
 
     return () => {
       if (socketRef.current) {
-        socketRef.current.off("disconnect");
         socketRef.current.off("connect_error", handleErrors);
         socketRef.current.off("connect_failed", handleErrors);
-
         socketRef.current.disconnect();
         resetSocket();
       }
@@ -45,5 +38,5 @@ export default function useSocket(navigate) {
 
   }, [navigate]);
 
-  return { socketRef, isConnected };
+  return { socketRef, ready };
 }

@@ -47,6 +47,7 @@ function EditorPage() {
   const [output, setOutput] = useState("");
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
 
   const codeRef = useRef(null);
   const editorRef = useRef(null);
@@ -59,7 +60,7 @@ function EditorPage() {
     codeRef.current = code;
   }, []);
 
-  const { socketRef, isConnected } = useSocket(navigate);
+  const { socketRef, ready } = useSocket(navigate);
 
   useRoomEvents({
     socketRef,
@@ -68,7 +69,9 @@ function EditorPage() {
     email,
     setClients,
     setRole,
-    navigate
+    navigate,
+    isConnected,
+    setIsConnected
   });
 
   useEditorSync({
@@ -79,6 +82,9 @@ function EditorPage() {
     setIsLoading
   });
 
+  if (!ready) {
+    return <LoadingPage message="waiting for socket connection..." />;
+  }
 
    async function copyRoomId(){
         try{

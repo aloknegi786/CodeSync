@@ -9,21 +9,29 @@ export default function useRoomEvents({
   email,
   setClients,
   setRole,
-  navigate
+  navigate,
+  isConnected,
+  setIsConnected
 }) {
 
   useEffect(() => {
-
+    console.log("useRoomEvents: Initializing room event listeners...");
+    console.log("socketRef:", socketRef.current);
     if (!socketRef.current) return;
 
     socketRef.current.emit(ACTIONS.JOIN, {
       roomId,
       username,
-      email
+      email,
     });
 
-    socketRef.current.on(ACTIONS.JOINED, ({ clients, username: joinedUser, email: joinedEmail, Role, action }) => {
+    console.log(`successfully emitted join event`);
 
+    socketRef.current.on(ACTIONS.JOINED, ({ clients, username: joinedUser, email: joinedEmail, Role, action }) => {
+      console.log(`${joinedUser} (${joinedEmail}) has ${action} the room as ${Role}, isConnected: ${isConnected}`);
+      if(!isConnected) {
+        setIsConnected(true);
+      }
       if(!(joinedEmail === email && action === "promoted as editor")){
         toast.success(`${joinedUser} ${action}`);
       }

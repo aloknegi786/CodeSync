@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { auth } from "./firebase";
 import { Navigate, Outlet } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
+import LoadingPage from "../pages/LoadingPage";
 
 const AuthGuard = () => {
     const [user, setUser] = useState(null);
@@ -17,7 +18,7 @@ const AuthGuard = () => {
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <LoadingPage message="Thank you for waiting..."/>;
     }
 
     if (!user) {

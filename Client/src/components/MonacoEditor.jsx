@@ -64,7 +64,6 @@ const handleEditorDidMount = (editor, monaco) => {
       ydoc.awareness
     );
 
-    // Broadcast local changes to the network
     ydoc.on('update', (update, origin) => {
       setValue(ytext.toString());
       if (onCodeChange) onCodeChange(ytext.toString());
@@ -80,7 +79,6 @@ const handleEditorDidMount = (editor, monaco) => {
       }
     });
 
-    // Request initial sync data from the backend
     socketRef.current.emit(ACTIONS.SYNC_CODE, {
       socketId: socketRef.current.id,
       roomId
@@ -95,6 +93,7 @@ const handleEditorDidMount = (editor, monaco) => {
     // --- YJS SOCKET LISTENERS ---
     const handleInitialState = (stateVector) => {
       // Apply the update and label it as coming from the 'network' (prevents rebroadcasting)
+      console.log("Received initial Yjs state from backend, applying update...", stateVector);
       Y.applyUpdate(ydoc, new Uint8Array(stateVector), 'network');
     };
 
