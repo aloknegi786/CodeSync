@@ -180,3 +180,15 @@
   margin-bottom: 20px;
 }
 
+.remote-cursor {
+  position: relative;
+}
+
+.remote-cursor::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  width: 2px;
+  height: 18px;
+  background: red;
+}

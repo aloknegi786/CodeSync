@@ -1,5 +1,5 @@
 import { Server } from 'socket.io';
-import { registerSocketHandlers } from '../controllers/socketController.js';
+import { registerSocketHandlers } from './socketHandlers/index.js';
 
 export const setupSocketServer = (server) => {
   const io = new Server(server, {

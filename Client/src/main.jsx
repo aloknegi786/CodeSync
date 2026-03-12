@@ -11,7 +11,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import { LiveblocksProvider } from '@liveblocks/react';
+// import { LiveblocksProvider } from '@liveblocks/react';
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
