@@ -53,6 +53,7 @@ export async function executeCode(language, code, input = "") {
   const args = [
     "run",
     "--rm",
+    "-i",
     "-m", "256m",
     "--cpus", "1",
     "--network", "none",
@@ -73,6 +74,11 @@ export async function executeCode(language, code, input = "") {
         MSYS_NO_PATHCONV: "1"
       }
     });
+
+    if (input) {
+      proc.stdin.write(input + "\n");
+    }
+    proc.stdin.end(); // Tell the process no more input is coming
 
     let output = "";
     let error = "";
