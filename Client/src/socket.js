@@ -15,7 +15,6 @@ export const initSocket = async () => {
 
     if (!socket) {
         const options = {
-            transports: ['websocket'],
             timeout: 20000,
             reconnectionAttempts: Infinity,
             reconnectionDelay: 1000,
