@@ -50,30 +50,35 @@ int main() {
 
 export const LANGUAGE_INFO = {
   cpp: {
+    file: "main.cpp",
     version: "C++ (GCC 13)",
     description:
       "Compiled using GCC inside a Docker container. STL containers like std::set and std::map are available.",
   },
 
   c: {
+    file: "main.c",
     version: "C (GCC 13)",
     description:
       "Compiled using GCC inside an isolated Docker container environment.",
   },
 
   java: {
+    file: "Main.java",
     version: "Java (Temurin 21)",
     description:
       "Executed using Eclipse Temurin JDK 21 inside a Docker container.",
   },
 
   javascript: {
+    file: "main.js",
     version: "JavaScript (Node.js 22)",
     description:
       "Executed using Node.js runtime inside a Docker container.",
   },
 
   python: {
+    file: "main.py",
     version: "Python (3.12)",
     description:
       "Executed using Python 3 inside a Docker container environment.",

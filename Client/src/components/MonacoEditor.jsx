@@ -23,8 +23,19 @@ function getColorForClient(clientId) {
 }
 
 const MonacoEditor = forwardRef(({
-  socketRef, roomId, onCodeChange, role, setEditorInstance,
-  setOutput, setInput, input, output, setError, error, isLoading, setIsLoading
+  socketRef, 
+  roomId, 
+  onCodeChange, 
+  role, 
+  setEditorInstance,
+  setOutput, 
+  setInput, 
+  input, 
+  output, 
+  setError, 
+  error, 
+  isExecuting,
+  setIsExecuting
 }, ref) => {
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
@@ -140,13 +151,10 @@ const MonacoEditor = forwardRef(({
       } : null);
     });
 
-    // ✅ FIXED: Send awareness only for non-network origins
     awareness.on("update", ({ added, updated, removed }, origin) => {
-      // ✅ FIXED: Was incorrectly blocking sends; only skip if from network
       if (origin === "network") return;
 
       const currentRole = latestRole.current;
-      // ✅ FIXED: Use latestRole.current instead of stale `role`
       console.log(currentRole, "awareness update - added:", added, "updated:", updated, "removed:", removed);
       if (currentRole === "viewer" || currentRole === "pending") return;
 
@@ -159,7 +167,6 @@ const MonacoEditor = forwardRef(({
       });
     });
 
-    // ✅ FIXED: Render cursor labels with username + color
     awareness.on("change", () => {
       const monaco = monacoRef.current;
       if (!monaco || !editor) return;
@@ -207,7 +214,6 @@ const MonacoEditor = forwardRef(({
           document.head.appendChild(style);
         }
 
-        // ✅ Cursor blinking line decoration
         if (state.cursor) {
           decorations.push({
             range: new monaco.Range(
@@ -382,8 +388,8 @@ const MonacoEditor = forwardRef(({
           role={role}
           socketRef={socketRef}
           roomId={roomId}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
+          isExecuting={isExecuting}
+          setIsExecuting={setIsExecuting}
         />
       )}
     </div>

@@ -66,9 +66,10 @@ export function registerRoomHandler(io, socket) {
     const stateVector = Y.encodeStateAsUpdate(roomDetail.ydoc);
     socket.emit('yjs_initial_state', stateVector);
     socket.emit(ACTIONS.OUTPUT_CHANGE, {
-      output: roomDetail.output || [], // ✅ FIX #7: consistent array type
+      output: roomDetail.output || [],
       isError: roomDetail.isError
     });
     socket.emit(ACTIONS.INPUT_CHANGE, { newInput: roomDetail.input || "" });
+    socket.emit("language_updated", { language: roomDetail.language });
   });
 }

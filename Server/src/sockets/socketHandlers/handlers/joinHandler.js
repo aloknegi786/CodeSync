@@ -72,6 +72,7 @@ export function registerJoinHandler(io, socket) {
 
       room.set(email, existingUser);
       sendUserList(io, socket, roomId, username, email, existingUser.role, "reconnected");
+      
       return;
     }
 
@@ -183,7 +184,6 @@ async function initializeRoom(roomId, email, username) {
     console.error("Error loading room data:", err);
   }
 
-  // ✅ Only save host to DB if this is a brand new room
   if (isNewRoom) {
     try {
       await pool.query(
@@ -197,8 +197,7 @@ async function initializeRoom(roomId, email, username) {
       console.error("Error saving host to DB:", err);
     }
   }
-  // ✅ If existing room, host is already loaded from DB into room map above
-  // No override needed — resolvedHost is just used for roomDetails metadata
+
 
   roomDetails.set(roomId, {
     host: resolvedHost,  // ✅ always the real host regardless of who triggered init

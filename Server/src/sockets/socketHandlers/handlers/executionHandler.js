@@ -18,12 +18,18 @@ export function registerExecutionHandler(io, socket) {
     if (!roomDetail) return;
 
     if (roomDetail.isExecuting) {
-      io.to(socket.id).emit(ACTIONS.ERROR, { message: "Code is already executing. Please wait." });
+      io.to(socket.id).emit(ACTIONS.ACTION_ERROR, { message: "Code is already executing. Please wait." });
       return;
     }
 
     roomDetail.isExecuting = true;
     const codeToExecute = roomDetail.ydoc.getText('monaco').toString();
+
+    if(codeToExecute.trim() === "") {
+      io.to(socket.id).emit(ACTIONS.ACTION_ERROR, { message: "Code editor is empty. Please write some code to execute." });
+      roomDetail.isExecuting = false;
+      return;
+    }
 
     // to check time out, we create a promise that rejects after a certain time, and race it against the actual execution promise. This way, if the execution takes too long, we can handle it gracefully.
     const executionWithTimeout = Promise.race([
@@ -34,7 +40,12 @@ export function registerExecutionHandler(io, socket) {
     ]);
 
     try {
-      const output = await executionWithTimeout;
+      const {status,  output, isError} = await executionWithTimeout;
+      if(status !== "success") {
+        io.to(socket.id).emit(ACTIONS.ACTION_ERROR, { message: "Code execution failed. Please check your code and try again." });
+        roomDetail.isExecuting = false;
+        return;
+      }
       roomDetail.output = (output ?? "").trim().split("\n").filter(line => line !== "");
       roomDetail.isError = false;
     } catch (err) {

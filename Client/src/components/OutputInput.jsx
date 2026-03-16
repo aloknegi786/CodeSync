@@ -4,7 +4,7 @@ import OutputBox from "./OutputBox";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import "./splitter.css";
 
-export default function OutputInput({output, setInput, error,input, role, socketRef, roomId}) {
+export default function OutputInput({output, setInput, error,input, role, socketRef, roomId, isExecuting}) {
   return (
     <Box 
       display="flex"
@@ -54,7 +54,7 @@ export default function OutputInput({output, setInput, error,input, role, socket
               overflow: 'hidden',
             }}
           >
-            <OutputBox output={output} error={error}/>
+            <OutputBox output={output} error={error} isExecuting={isExecuting}/>
           </SplitterPanel>
         </Splitter>
       </Box>

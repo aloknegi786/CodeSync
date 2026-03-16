@@ -11,12 +11,11 @@ export default function useRoomEvents({
   setRole,
   navigate,
   isConnected,
-  setIsConnected
+  setIsConnected,
+  setIsExecuting,
 }) {
 
   useEffect(() => {
-    console.log("useRoomEvents: Initializing room event listeners...");
-    console.log("socketRef:", socketRef.current);
     if (!socketRef.current) return;
 
     socketRef.current.emit(ACTIONS.JOIN, {
@@ -25,7 +24,6 @@ export default function useRoomEvents({
       email,
     });
 
-    console.log(`successfully emitted join event`);
 
     socketRef.current.on(ACTIONS.JOINED, ({ clients, username: joinedUser, email: joinedEmail, Role, action }) => {
       console.log(`${joinedUser} (${joinedEmail}) has ${action} the room as ${Role}, isConnected: ${isConnected}`);
@@ -50,6 +48,7 @@ export default function useRoomEvents({
     });
 
     socketRef.current.on(ACTIONS.ACTION_ERROR, ({ message }) => {
+      setIsExecuting(false);
       toast.error(message);
     });
 

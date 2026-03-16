@@ -46,8 +46,8 @@ function EditorPage() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [error, setError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
 
   const codeRef = useRef(null);
   const editorRef = useRef(null);
@@ -71,7 +71,8 @@ function EditorPage() {
     setRole,
     navigate,
     isConnected,
-    setIsConnected
+    setIsConnected,
+    setIsExecuting
   });
 
   useEditorSync({
@@ -79,7 +80,7 @@ function EditorPage() {
     setInput,
     setOutput,
     setError,
-    setIsLoading
+    setIsExecuting,
   });
 
   if (!ready) {
@@ -184,8 +185,8 @@ function EditorPage() {
             setOutput={setOutput}
             input={input}
             setError={setError}
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
+            isExecuting={isExecuting}
+            setIsExecuting={setIsExecuting}
           />
         </SplitterPanel>
 
@@ -201,6 +202,7 @@ function EditorPage() {
             error={error}
             socketRef={socketRef}
             roomId={roomId}
+            isExecuting={isExecuting}
           />
         </SplitterPanel>
       </Splitter>

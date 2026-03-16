@@ -6,7 +6,7 @@ export default function useEditorSync({
   setInput,
   setOutput,
   setError,
-  setIsLoading
+  setIsExecuting,
 }) {
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function useEditorSync({
     socketRef.current.on(ACTIONS.OUTPUT_CHANGE, ({ output, isError }) => {
       setOutput(output);
       setError(isError);
-      setIsLoading(false);
+      setIsExecuting(false);
     });
 
     return () => {

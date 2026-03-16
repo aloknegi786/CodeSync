@@ -1,7 +1,18 @@
 import { Box } from "@chakra-ui/react";
 import MonacoEditor from "./MonacoEditor";
 
-function EditorPanel({ socketRef, roomId, role, handleSetEditor, handleSetCode, setOutput, input, setError, isLoading, setIsLoading }) {
+function EditorPanel({ 
+  socketRef, 
+  roomId, 
+  role, 
+  handleSetEditor, 
+  handleSetCode, 
+  setOutput, 
+  input, 
+  setError, 
+  isExecuting,
+  setIsExecuting
+}) {
   return (
     <div className="h-full w-full">
       <Box
@@ -23,8 +34,8 @@ function EditorPanel({ socketRef, roomId, role, handleSetEditor, handleSetCode, 
             setOutput={setOutput}
             input={input}
             setError={setError}
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
+            isExecuting={isExecuting}
+            setIsExecuting={setIsExecuting}
           />
         )}
       </Box>
