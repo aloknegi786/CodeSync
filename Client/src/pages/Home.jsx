@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { auth } from "../lib/firebase";
 import { signOut } from "firebase/auth";
 
+import RoomsList from "../components/RoomList";
+
 function Home() {
 
   const navigate = useNavigate();
@@ -13,6 +15,8 @@ function Home() {
   const [roomId, setRoomId] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [description, setDescription] = useState("");
+  const [isNewRoom, setIsNewRoom] = useState(false);
 
   useEffect(() => {
 
@@ -33,6 +37,7 @@ function Home() {
 
     const id = uuidV4();
     setRoomId(id);
+    setIsNewRoom(true);
 
     toast.success("Room Id created. You can now share it with your friends!");
   };
@@ -44,10 +49,16 @@ function Home() {
       return;
     }
 
+    if(isNewRoom && !description){
+      toast.error("Room description is required for new room");
+      return ;
+    }
+
     navigate(`/editor/${roomId}`, {
       state: {
         username,
-        email
+        email,
+        description
       }
     });
 
@@ -96,10 +107,10 @@ function Home() {
           <input
             type="text"
             className="inputBox"
-            placeholder="User-name"
-            value={username}
-            style={{ cursor: "not-allowed"}}
-            readOnly
+            placeholder="Description (optional for invite)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            onKeyUp={handleInputEnter}
           />
 
           {/* Auto-filled email from Google auth */}
@@ -144,16 +155,10 @@ function Home() {
 
         </div>
 
+
       </div>
 
-      <footer>
-        <h4>
-          Built with 💛 by{" "}
-          <a href="https://github.com/aloknegi786">
-            Alok Negi
-          </a>
-        </h4>
-      </footer>
+        <RoomsList email={email} />
 
     </div>
   );

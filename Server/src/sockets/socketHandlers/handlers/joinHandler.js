@@ -11,7 +11,7 @@ import * as Y from 'yjs';
 // import { Awareness } from 'y-protocols/awareness';
 
 export function registerJoinHandler(io, socket) {
-  socket.on(ACTIONS.JOIN, async ({ roomId, username, email }) => {
+  socket.on(ACTIONS.JOIN, async ({ roomId, username, email, description }) => {
     socket.join(roomId);
     socket.data.roomId = roomId;
     socket.data.username = username;
@@ -20,7 +20,7 @@ export function registerJoinHandler(io, socket) {
     if (!roomDetails.has(roomId) && !creatingRooms.has(roomId)) {
       creatingRooms.add(roomId);
       try {
-        await initializeRoom(roomId, email, username);
+        await initializeRoom(roomId, email, username, description);
       } finally {
         creatingRooms.delete(roomId);
       }
@@ -71,8 +71,7 @@ export function registerJoinHandler(io, socket) {
       }
 
       room.set(email, existingUser);
-      sendUserList(io, socket, roomId, username, email, existingUser.role, "reconnected");
-      
+      sendUserList(io, socket, roomId, username, email, existingUser.role, "reconnected");   
       return;
     }
 
@@ -114,14 +113,13 @@ export function registerJoinHandler(io, socket) {
   });
 }
 
-async function initializeRoom(roomId, email, username) {
+async function initializeRoom(roomId, email, username, description) {
   roomUsers.set(roomId, new Map());
   const room = roomUsers.get(roomId);
 
   let loadedLanguage = "java";
   const ydoc = new Y.Doc();
 
-  // ✅ Fetch the real host from DB first — don't assume the joining socket is host
   let actualHostEmail = null;
   try {
     const hostRes = await pool.query(
@@ -135,7 +133,6 @@ async function initializeRoom(roomId, email, username) {
     console.error("Error fetching room host:", err);
   }
 
-  // If no DB record exists yet, this IS a brand new room — joining socket is the real host
   const isNewRoom = actualHostEmail === null;
   const resolvedHost = isNewRoom ? email : actualHostEmail;
 
@@ -158,16 +155,15 @@ async function initializeRoom(roomId, email, username) {
         const ytext = ydoc.getText("monaco");
         ytext.insert(0, CODE_SNIPPETS["java"]);
         await pool.query(
-          `INSERT INTO rooms (room_id, host_email, language, yjs_state, plain_text_code) 
-           VALUES ($1, $2, $3, $4, $5) ON CONFLICT (room_id) DO NOTHING`,
-          [roomId, email, "java",
+          `INSERT INTO rooms (room_id, host_email, description, language, yjs_state, plain_text_code) 
+           VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (room_id) DO NOTHING`,
+          [roomId, email, description, "java",
            Buffer.from(Y.encodeStateAsUpdate(ydoc)).toString('base64'),
            CODE_SNIPPETS["java"]]
         );
       }
     }
 
-    // Load all permanent roles into memory
     const dbUsersRes = await pool.query(
       'SELECT email, username, role FROM room_users WHERE room_id = $1', [roomId]
     );
@@ -200,7 +196,7 @@ async function initializeRoom(roomId, email, username) {
 
 
   roomDetails.set(roomId, {
-    host: resolvedHost,  // ✅ always the real host regardless of who triggered init
+    host: resolvedHost,
     hostSocketId: null,
     language: loadedLanguage,
     ydoc,

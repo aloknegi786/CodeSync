@@ -7,6 +7,7 @@ export default function useRoomEvents({
   roomId,
   username,
   email,
+  description,
   setClients,
   setRole,
   navigate,
@@ -22,6 +23,7 @@ export default function useRoomEvents({
       roomId,
       username,
       email,
+      description
     });
 
 

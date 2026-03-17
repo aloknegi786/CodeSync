@@ -6,8 +6,6 @@ import { registerUserHandler } from './handlers/userHandler.js';
 import { registerDisconnectHandler } from './handlers/disconnectHandler.js';
 
 export function registerSocketHandlers(io, socket) {
-  console.log('socket connected:', socket.id);
-
   registerJoinHandler(io, socket);
   registerYjsHandler(io, socket);
   registerRoomHandler(io, socket);

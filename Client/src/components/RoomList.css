@@ -1,0 +1,219 @@
+/* ── Rooms Panel ── */
+.roomsPanel {
+  flex: 0 0 calc(50% - 0.625rem);
+  width: calc(50% - 0.625rem);
+  height: 500px;
+  min-height: 475px;
+  max-height: 475px;
+  margin: 10px;
+  background: #0f1420;
+  border: 1px solid #1e2535;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* ── Panel Header ── */
+.roomsPanelHeader {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #c9d1d9;
+  cursor: pointer;
+  border-bottom: 1px solid #1e2535;
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.roomsPanelHeader:hover { background: #141926; }
+
+.roomsPanelHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* ── Count Badge ── */
+.roomsCount {
+  background: #1de99b1a;
+  color: #1de99b;
+  border: 1px solid #1de99b33;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 7px;
+}
+
+/* ── Refresh Button ── */
+.refreshBtn {
+  background: transparent;
+  border: none;
+  color: #4a506e;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.refreshBtn:hover { color: #1de99b; }
+
+/* ── Chevron ── */
+.room-chevron {
+  color: #4a506e;
+  font-size: 0.75rem;
+  transition: transform 0.2s;
+  display: inline-block;
+  line-height: 1;
+}
+
+.room-chevron.open { transform: rotate(180deg); }
+
+/* ── Rooms List ── */
+.roomsList {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.roomsList::-webkit-scrollbar { width: 3px; }
+.roomsList::-webkit-scrollbar-track { background: transparent; }
+.roomsList::-webkit-scrollbar-thumb { background: #1e2535; border-radius: 4px; }
+
+/* ── Empty State ── */
+.roomsEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2e3555;
+  font-size: 0.8rem;
+}
+
+/* ── Room Card ── */
+.room-card {
+  flex-shrink: 0;
+  border-bottom: 1px solid #151c2c;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.room-card:last-child { border-bottom: none; }
+.room-card:hover      { background: #141926; }
+.room-card.expanded   { background: #141926; }
+
+/* ── Card Header Row ── */
+.room-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.65rem 1.1rem;
+}
+
+/* ── Language Badge ── */
+.room-lang-badge {
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Room ID Preview ── */
+.room-id-preview {
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: #4a506e;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Date ── */
+.room-date {
+  font-size: 0.65rem;
+  color: #2e3555;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Expanded Card Body ── */
+.room-card-body {
+  padding: 0.5rem 1.1rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #0a0e18;
+  border-top: 1px solid #151c2c;
+}
+
+/* ── Full ID Row ── */
+.room-id-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #0d1117;
+  border: 1px solid #1e2535;
+  border-radius: 6px;
+  padding: 5px 9px;
+}
+
+.room-id-full {
+  font-family: monospace;
+  font-size: 0.67rem;
+  color: #8b949e;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Copy Button ── */
+.copy-btn {
+  flex-shrink: 0;
+  font-size: 0.67rem;
+  padding: 3px 9px;
+  border: 1px solid #1e2535;
+  border-radius: 5px;
+  background: transparent;
+  color: #4a506e;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.copy-btn:hover  {
+  color: #1de99b;
+  border-color: #1de99b44;
+  background: #1de99b0d;
+}
+
+.copy-btn.copied {
+  color: #1de99b;
+  border-color: #1de99b44;
+  background: #1de99b0d;
+}
+
+/* ── Description ── */
+.room-description {
+  font-size: 0.72rem;
+  color: #4a506e;
+  margin: 0;
+  line-height: 1.5;
+}
+
+
