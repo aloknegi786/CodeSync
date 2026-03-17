@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import signInWithGoogle from "../lib/signInWithGoogle";
 import { auth } from "../lib/firebase";
 import toast from "react-hot-toast";
-import "./styles/LoginPage.css";
+import "./styles/loginPage.css";
 
 const DNAIcon = () => (
   <svg width="42" height="50" viewBox="0 0 42 52" fill="none" xmlns="http://www.w3.org/2000/svg">
