@@ -37,7 +37,6 @@ export async function saveAndCloseRoom(io, roomId) {
         ),
         redisClient.setEx(`room_state:${roomId}`, 86400, base64State)
       ]);
-      console.log(`Room ${roomId} backed up successfully.`);
     } catch (err) {
       console.error("Final save error:", err);
       try {

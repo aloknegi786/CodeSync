@@ -9,7 +9,7 @@ redisClient.on("connect", function() {
 });
 
 redisClient.on("error", function(err) {
-  throw err;
+  console.log("error while connecting to redis..");
 });
 await redisClient.connect()
 

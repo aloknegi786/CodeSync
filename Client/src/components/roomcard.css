@@ -1,0 +1,306 @@
+/* Room Card Container */
+.room-card {
+  /* background: #fff; */
+  /* border: 1px solid #e5e7eb; */
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.room-card:hover {
+  /* border-color: #d1d5db; */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.room-card.expanded {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+/* Card Header */
+.room-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+/* Language Badge */
+.room-lang-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.room-id-preview {
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+  flex: 1;
+}
+
+.room-date {
+  font-size: 13px;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.room-chevron {
+  font-size: 16px;
+  color: #9ca3af;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.room-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Card Body */
+.room-card-body {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Room ID Row */
+.room-id-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.room-id-full {
+  flex: 1;
+  padding: 8px 12px;
+  /* background: #f3f4f6; */
+  border-radius: 4px;
+  font-size: 13px;
+  color: #1f2937;
+  font-family: "Courier New", monospace;
+  word-break: break-all;
+}
+
+/* Copy Button */
+.copy-btn {
+  padding: 6px 12px;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.copy-btn:hover:not(:disabled) {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.copy-btn.copied {
+  background: #d1fae5;
+  border-color: #6ee7b7;
+  color: #059669;
+}
+
+.copy-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Description */
+.room-description {
+  margin: 0;
+  font-size: 15px;
+  color: white;
+  line-height: 1.5;
+  /* background: #f9fafb; */
+  color: #1f2937;
+  padding: 10px 12px;
+  border-radius: 4px;
+}
+
+/* Room Actions */
+.room-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Delete Button */
+.delete-btn {
+  padding: 6px 12px;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #991b1b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.delete-btn:hover {
+  background: #fecaca;
+  border-color: #f87171;
+}
+
+.delete-btn:active {
+  transform: scale(0.98);
+}
+
+/* Delete Confirmation Overlay */
+.delete-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Delete Confirmation Modal */
+.delete-confirm-modal {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.delete-confirm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.delete-confirm-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #6b7280;
+}
+
+.delete-confirm-message {
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.delete-confirm-message code {
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: "Courier New", monospace;
+  color: #1f2937;
+}
+
+/* Delete Confirmation Actions */
+.delete-confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.cancel-btn,
+.confirm-delete-btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.cancel-btn {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.cancel-btn:hover {
+  background: #e5e7eb;
+}
+
+.confirm-delete-btn {
+  background: #dc2626;
+  color: white;
+}
+
+.confirm-delete-btn:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.confirm-delete-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.confirm-delete-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}

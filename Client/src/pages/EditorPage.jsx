@@ -40,6 +40,7 @@ function EditorPage() {
 
   const username = location.state.username;
   const email = location.state.email;
+  const description = location.state.description;
 
   const [clients, setClients] = useState([]);
   const [role, setRole] = useState("viewer");
@@ -67,6 +68,7 @@ function EditorPage() {
     roomId,
     username,
     email,
+    description,
     setClients,
     setRole,
     navigate,
