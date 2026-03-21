@@ -12,8 +12,8 @@ const PORT = process.env.PORT || 5000;
 
 
 app.use(cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true // If you are using cookies/sessions
+    origin: '*',
+    // credentials: true
 }));
 app.use(express.json());
 
